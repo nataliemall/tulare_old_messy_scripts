@@ -82,7 +82,8 @@ for crop_type in tqdm(crop_list):
     crop4_df[crop_type[0:10] + ' acres'] = crop2_df[crop_type[0:10] + ' acres'].loc[crop2_df.index]  # Puts the individual crop acreage list into the overall dataframe crop4_df 
 
     crop_test = crop4_df.loc[crop4_df.index == '10M10S13E34']
-
+    crop4_df.loc['10M13S13E28']
+    
     crop_iter = crop_iter + 1
 pdb.set_trace()
 

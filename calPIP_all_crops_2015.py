@@ -22,6 +22,7 @@ calPIP_2015_data = pd.read_csv('calPIP_includes_crop_areas/calPIP2015.csv', sep=
 # calPIP_2015_data.COMTRS
 
 crop_list = calPIP_2015_data.SITE_NAME.unique()
+crop_list = crop_list[0:10]
 
 # crop_labels_complete = crop_list[1:10, :]
 # column_list = np.zeros(len(calPIP_2015_data.SITE_NAME.unique()))
@@ -39,10 +40,9 @@ crop4_df = pd.DataFrame(array_zeros1, index = [all_COMTRS], columns = [ column_l
 crop5_df = pd.DataFrame(index = [all_COMTRS])
 # run for each crop type, then connect to larger calPIP array using some connector index 
 
-pdb.set_trace()
 
 crop_iter = 0 
-for crop_type in tqdm(crop_list[0:2]):
+for crop_type in tqdm(crop_list):
 
     crop_type_vals = calPIP_2015_data.loc[lambda df: calPIP_2015_data.SITE_NAME == crop_type, : ]  # pulls permits for each of the crop types (filters for only this crop)
     no_location_IDs = len(crop_type_vals.SITE_LOCATION_ID.unique()) # number of unique parcel IDs for specific crop 
@@ -84,16 +84,28 @@ for crop_type in tqdm(crop_list[0:2]):
 
         COMTRS_iter = COMTRS_iter + 1 
 
+    
     crop2_df[lambda crop2_df: crop2_df.columns[0]] = crop_acres_list  # crop acreage list for this specific crop 
 
 
     # crop4_df[lambda crop4_df: crop4_df.columns[crop_iter]] = crop_acres_list
-    pdb.set_trace()
+    # pdb.set_trace()
 
     # pd.merge(crop5_df, crop2_df, how = 'outer')#, on = index)
-    crop4_df[index] = crop2_df.columns[0] 
-    crop_iter = crop_iter + 1
+    # crop4_df[1] = crop2_df.columns[:]
+    # crop4_df['ALFALFA (F acres'] = crop2_df['ALFALFA (F acres'].loc['10M10S13E34']   # YAY KEEP FOR FUTURE REF
+
+    # crop4_df['ALFALFA (F acres'] = crop2_df['ALFALFA (F acres'].loc[crop2_df.index]   # YAY KEEP FOR FUTURE REF
     pdb.set_trace()
+    crop4_df[crop_type[0:10] + ' acres'] = crop2_df[crop_type[0:10] + ' acres'].loc[crop2_df.index]  # Puts the individual crop acreage list into the overall dataframe crop4_df 
+
+    crop_test = crop4_df.loc[crop4_df.index == '10M10S13E34']
+    crop4_df.loc['10M13S13E28']
+    
+    crop_iter = crop_iter + 1
+
+
+
 
 
     save_acres = 1     # Saves each crop's data for each COMTRS 
@@ -108,15 +120,22 @@ for crop_type in tqdm(crop_list[0:2]):
         # crop3_df.to_csv('crop_label.csv',header = True, na_rep = '0', index = False)    # how do I change the name of the csv file depending on the crop type? 
         
         path='/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages'
-        pdb.set_trace()
+        # pdb.set_trace()
+
+        test = os.path.join(path, crop_file_name)
+
+        crop3_df.to_csv(os.path.join(path, crop_file_name), header = True, na_rep = '0', index = False)   # HOW SAVE? 
+
+# pdb.set_trace()
+
+crop5_df = crop4_df.reset_index()
 
 
-        crop4_df.to_csv(os.path.join(path, crop_file_name), header = True, na_rep = '0', index = False)   # HOW SAVE? 
-
+crop5_df.to_csv(os.path.join(path, 'all_crops_2015.csv'), header = True, na_rep = '0', index = False)
 
         #make new row in the dataframe 
 
-    pdb.set_trace()
+pdb.set_trace()
 
 
 

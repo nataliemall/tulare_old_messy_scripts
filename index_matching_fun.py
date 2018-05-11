@@ -10,7 +10,7 @@ from mpl_toolkits.basemap import Basemap
 from tqdm import tqdm  # for something in tqdm(something something):
 
 
-calPIP_2015_data = pd.read_csv('calPIP_includes_crop_areas/calPIP2015.csv', sep='\t')#, parse_dates=['DATE']) #error_bad_lines=False)#, index_col=0, parse_dates=True)
+calPIP_2015_data = pd.read_csv('calPIP2015.csv', sep='\t')#, parse_dates=['DATE']) #error_bad_lines=False)#, index_col=0, parse_dates=True)
 
 
 crop_list = calPIP_2015_data.SITE_NAME.unique()
@@ -76,7 +76,10 @@ for crop_type in tqdm(crop_list[0:2]):
 
     # pd.merge(crop5_df, crop2_df, how = 'outer')#, on = index)
     crop4_df[1] = crop2_df.columns[:]
-    crop4_df['ALFALFA (F acres'] = crop2_df['ALFALFA (F acres'].loc['10M10S13E34']   # YAY KEEP FOR FUTURE REF
+    # crop4_df['ALFALFA (F acres'] = crop2_df['ALFALFA (F acres'].loc['10M10S13E34']   # YAY KEEP FOR FUTURE REF
+
+    crop4_df['ALFALFA (F acres'] = crop2_df['ALFALFA (F acres'].loc[crop2_df.index]   # YAY KEEP FOR FUTURE REF
+    crop4_df[crop_type[0:10] + ' acres'] = crop2_df[crop_type[0:10] + ' acres'].loc[crop2_df.index]
 
     crop_test = crop4_df.loc[crop4_df.index == '10M10S13E34']
 

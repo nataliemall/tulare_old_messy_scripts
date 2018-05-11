@@ -31,7 +31,7 @@ crop5_df = pd.DataFrame(index = [all_COMTRS])
 
 
 crop_iter = 0 
-for crop_type in tqdm(crop_list[0:2]):
+for crop_type in tqdm(crop_list):
 
     crop_type_vals = calPIP_2015_data.loc[lambda df: calPIP_2015_data.SITE_NAME == crop_type, : ]  # pulls permits for each of the crop types (filters for only this crop)
     no_location_IDs = len(crop_type_vals.SITE_LOCATION_ID.unique()) # number of unique parcel IDs for specific crop 
@@ -72,19 +72,19 @@ for crop_type in tqdm(crop_list[0:2]):
 
 
     # crop4_df[lambda crop4_df: crop4_df.columns[crop_iter]] = crop_acres_list
-    pdb.set_trace()
+    # pdb.set_trace()
 
     # pd.merge(crop5_df, crop2_df, how = 'outer')#, on = index)
-    crop4_df[1] = crop2_df.columns[:]
+    # crop4_df[1] = crop2_df.columns[:]
     # crop4_df['ALFALFA (F acres'] = crop2_df['ALFALFA (F acres'].loc['10M10S13E34']   # YAY KEEP FOR FUTURE REF
 
-    crop4_df['ALFALFA (F acres'] = crop2_df['ALFALFA (F acres'].loc[crop2_df.index]   # YAY KEEP FOR FUTURE REF
-    crop4_df[crop_type[0:10] + ' acres'] = crop2_df[crop_type[0:10] + ' acres'].loc[crop2_df.index]
+    # crop4_df['ALFALFA (F acres'] = crop2_df['ALFALFA (F acres'].loc[crop2_df.index]   # YAY KEEP FOR FUTURE REF
+    crop4_df[crop_type[0:10] + ' acres'] = crop2_df[crop_type[0:10] + ' acres'].loc[crop2_df.index]  # Puts the individual crop acreage list into the overall dataframe crop4_df 
 
     crop_test = crop4_df.loc[crop4_df.index == '10M10S13E34']
 
     crop_iter = crop_iter + 1
-    pdb.set_trace()
+pdb.set_trace()
 
 
 

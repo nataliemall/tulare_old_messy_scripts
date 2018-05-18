@@ -1,5 +1,5 @@
-#calPIP_all_crops_2015
-#For 2015, run loop for all crop types available in the data 
+#calPIP_all_crops_compiler.py 
+#For given year, run loop for all crop types available in the data 
 
 
 import numpy as np 
@@ -15,24 +15,24 @@ from tqdm import tqdm  # for something in tqdm(something something):
 
 
 # Function: enter year for desired data compilation, run for that year 
-def calPIP_summed(year):
+def calPIP_summed(year): 
 
     year_file  = 'calPIP' + str(year) + '.csv'
-
     file_name = os.path.join('calPIP_includes_crop_areas', year_file)
-
-    calPIP_data = pd.read_csv(file_name, sep = '\t') 
-    # pdb.set_trace()
-    # return file_name
-
-    # calPIP_2015_data = pd.read_csv('calPIP_includes_crop_areas/calPIP2015.csv', sep='\t') #Pulls data from CSV file for the year
+    calPIP_data = pd.read_csv(file_name, sep = '\t')   #Pulls data from CSV file for the year
 
     crop_list = calPIP_data.SITE_NAME.unique()
     column_list = []
+    # pdb.set_trace()
     for crop_type in tqdm(crop_list): 
-        crop_strings = str(crop_type[0:15] + ' acres')
-        crop_cleaned = crop_strings.replace("/", "_")  # transform these names by replacing '/' with '_' 
-        column_list.append(crop_cleaned)
+        if type(crop_type) == float:
+            crop_cleaned = str(crop_type)
+            column_list.append(crop_cleaned)
+        else:
+            crop_strings = str(crop_type[0:15] + ' acres')
+            crop_cleaned = crop_strings.replace("/", "_")  # transform these names by replacing '/' with '_' 
+            column_list.append(crop_cleaned)
+    # pdb.set_trace()
 
     all_COMTRS = calPIP_data.COMTRS.unique()
     array_zeros1 = np.full((len(all_COMTRS), len(crop_list)), np.zeros) #array of zeros for dataset
@@ -82,17 +82,20 @@ def calPIP_summed(year):
         if save_acres == 1:
             crop3_df = crop2_df.reset_index()
             crop3_df.columns = ['COMTRS', crop_column]
-            path='/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages'
-            crop3_df.to_csv(os.path.join(path, (str(year) + crop_column + '.csv' ) ), header = True, na_rep = '0', index = False)   
+            directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages', str(year) + 'files' )
+            try: 
+                crop3_df.to_csv(os.path.join(directory, (str(year) + crop_column + '.csv' ) ), header = True, na_rep = '0', index = False)   
+            except: 
+                os.mkdir(directory) 
+                crop3_df.to_csv(os.path.join(directory, (str(year) + crop_column + '.csv' ) ), header = True, na_rep = '0', index = False)
 
-        pdb.set_trace()
     crop5_df = crop4_df.reset_index()
-    path_name = os.path.join(path, (str(year) + '_all_crops.csv')) 
-    crop5_df.to_csv(os.path.join(path, (str(year) + '_all_crops.csv')), header = True, na_rep = '0', index = False)
-    print(f 'Saved compiled {year} data in {path_name}')
+    path_name = os.path.join(directory, (str(year) + '_all_crops.csv')) 
+    crop5_df.to_csv(os.path.join(directory, (str(year) + '_all_crops.csv')), header = True, na_rep = '0', index = False)
+    print(f'Saved compiled {year} data in {path_name}')
 
     return crop5_df, crop2_df 
     pdb.set_trace()
 
 
-calPIP_summed(2015)
+calPIP_summed(2007)

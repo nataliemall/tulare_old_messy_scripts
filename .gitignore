@@ -1,4 +1,4 @@
 *.csv 
 test_ignore.md
 *.txt
-
+*.xlsx

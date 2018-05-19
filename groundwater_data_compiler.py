@@ -635,7 +635,7 @@ if groundwater_map3 ==1:
 
     plt.show()
 
-groundwater_map7 = 0 # - attempt2  set colorbar scale plots the average for the 5 years leading up, and the previous 5
+groundwater_map7 = 1 # - attempt2  set colorbar scale plots the average for the 5 years leading up, and the previous 5
 if groundwater_map7 ==1:
     RP_difference, lats, lons, range_string = average_depth_5year_comparison(2015)
 
@@ -659,7 +659,23 @@ if groundwater_map7 ==1:
     plt.clim(-100,65)
     plt.savefig("comparison_GW.png", dpi = 300)
     plt.show()
-    # pdb.set_trace()
+    pdb.set_trace()
+
+    ##################Fix this section to make a clean CSV file - then add to the function ######################
+    # gw_array7 = {'latitudes' : pd.Series([lats]), 'longitudes' : pd.Series([lons]), 'RP_difference' : pd.Series([RP_difference]) } 
+    lons7 = lons
+    lats7 = lats
+
+    gw_array7 = np.vstack((lats, lons, RP_difference))
+    gw_array7 = np.transpose(gw_array7)
+    # gw_array7 = np.array([[lats], [lons], [RP_difference]])
+    gw_df7 = pd.DataFrame(gw_array7)
+    gw_df7.columns = ['latitudes', 'longitudes', 'RP_difference']
+    gw_df7.to_csv('GW_change_2015.csv')
+    pdb.set_trace()
+
+    # change_year_before = tulare_wells18.change_from_year_prior.values # FIX THIS - Should use tulare_wells2 or tulare_wells_oct # depends on date entered for recent timeframe - tulare_wells10  - originally tulare_wells18
+    #############################################################################################################
 
 attempt_all_irrigation = 1  #plots all months of irrigation averages by season 
 if attempt_all_irrigation ==1:

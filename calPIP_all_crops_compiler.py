@@ -41,10 +41,11 @@ def calPIP_summed(year):
     # Runs for each crop type, then connects to larger calPIP array using COMTRS index 
     crop_iter = 0 
     for crop_type in tqdm(crop_list):
-
+        calPIP_data
         crop_type_vals = calPIP_data.loc[lambda df: calPIP_data.SITE_NAME == crop_type, : ]  # pulls permits for each of the crop types (filters for only this crop)
         no_location_IDs = len(crop_type_vals.SITE_LOCATION_ID.unique()) # number of unique parcel IDs for specific crop 
         ## ^ Edit location ID search - test for different SITE_LOCATION_ID
+
 
         COMTRS_list = crop_type_vals.COMTRS.unique()
         no_COMTRS = len(crop_type_vals.COMTRS.unique())   # number of unique COMTRS that grow specific crop 
@@ -65,11 +66,29 @@ def calPIP_summed(year):
             parcels_in_COMTRS = crop_type_vals.loc[crop_type_vals['COMTRS'] == COMTRS_value, :]  # filters by fields in this specific COMTRS section 
 
             if len(parcels_in_COMTRS.SITE_LOCATION_ID.unique()) == 1: 
-                total_acres = parcels_in_COMTRS.AMOUNT_PLANTED.iloc[0]
+                total_acres = parcels_in_COMTRS.AMOUNT_PLANTED.iloc[0]   # if only 1 value, just use that value 
             else:
+                parcel_IDs = parcels_in_COMTRS.SITE_LOCATION_ID.unique()  # array of unique parcel values in section
+                for individual_site in parcel_IDs: #goes through the individual sites in the secition 
+                    single_acreage = parcels_in_COMTRS.loc[parcels_in_COMTRS.SITE_LOCATION_ID == individual_site] # locates all permits a specific site
+                    total_acres = max(single_acreage.AMOUNT_PLANTED)
+                    if isnull(individual_site) == True
+
                 acres = parcels_in_COMTRS.AMOUNT_PLANTED.unique()   ###### put a check here to make sure they are separate parcels - use SITE_LOCATION_ID
+                # for each unique 
+
                 total_acres = sum(acres)   # adds up unique crop areas 
+                # If they have the same location ID, take the maximum value within that area
+                # pdb.set_trace()
                 # In this loop, put each acreage value in the crop4_df overall dataframe using iloc ??
+crop_type_vals.SITE_LOCATION_ID.loc[crop_type_vals.SITE_LOCATION_ID== Nan]
+ test = crop_type_vals.SITE_LOCATION_ID.loc[crop_type_vals.SITE_LOCATION_ID== 'NaN']
+                site_locations_unique = SITE_LOCATION_ID.unique()
+                # for individual_site in site_locations_unique:
+                    # something about how IF the SITE_LOCATION_ID is the same for multiple permits in the section, combine them? 
+                        # For each unique acreage value, find all the site_location_IDs 
+                    pdb.set_trace()
+
             crop_acres_list[COMTRS_iter] = total_acres
             COMTRS_iter = COMTRS_iter + 1 
 

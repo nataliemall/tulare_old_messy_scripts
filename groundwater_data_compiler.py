@@ -84,9 +84,9 @@ pdb.set_trace()
 # variables for comparing historical with 2012 data: 
 starting_datetime = '2012-07-01 00:00:00'   # ideally this will be variable  
 tulare_wells10 = well_data_tulare_only.loc[well_data_tulare_only['MEASUREMENT_DATE'] >= '2012-07-01 00:00:00', :]
-tulare_wells11 = tulare_wells10.loc[tulare_wells10['MEASUREMENT_DATE'] <= '2012-11-01 00:00:00', :]             # All the dates after a summer irrigation season 
+tulare_wells11 = tulare_wells10.loc[tulare_wells10['MEASUREMENT_DATE'] <= '2012-11-01 00:00:00', :]             # All the dates after a summer irrigation season (July - November)
 tulare_wells_1980 = well_data_tulare_only.loc[well_data_tulare_only['MEASUREMENT_DATE'] >= '1960-07-01 00:00:00', :]
-tulare_wells_1980_1985 = tulare_wells_1980.loc[tulare_wells_1980['MEASUREMENT_DATE'] <= '1985-11-01 00:00:00', :]
+tulare_wells_1980_1985 = tulare_wells_1980.loc[tulare_wells_1980['MEASUREMENT_DATE'] <= '1985-11-01 00:00:00', :]  # All measurement dates between 1960 and 1985
 
 tulare_wells13 = tulare_wells11[0:1] # starts dataframe of well data 
 
@@ -117,13 +117,14 @@ def average_depth_year_comparison(year_evaluating):
 
     year_range_string = ('Water level difference in October',starting,'through September', ending)
 
-
     lats = np.empty(len(tulare_county_IDs_all))
     lats[:] = np.nan
     lons = np.empty(len(tulare_county_IDs_all))
     lons[:] = np.nan
     RP_difference = np.empty(len(tulare_county_IDs_all))
     RP_difference[:] = np.nan
+    county_id5 = np.empty(len(tulare_county_IDs_all))
+    county_id5[:] = np.nan    
 
     well_iter = 0 
     for county_id in tqdm(tulare_county_IDs_all): 
@@ -155,9 +156,16 @@ def average_depth_year_comparison(year_evaluating):
         if RP_difference[well_iter] < -600:
             RP_difference[well_iter] = np.nan
         np.mean(water_year_evaluating.RP_READING)
-        well_iter = well_iter + 1
         # pdb.set_trace()
+        county_id5[well_iter] = county_id
 
+        well_iter = well_iter + 1
+    gw_array7 = np.vstack((county_id5, lats, lons, RP_difference))
+    gw_array7 = np.transpose(gw_array7)
+    gw_df7 = pd.DataFrame(gw_array7)
+    gw_df7.columns = ['county_ID', 'latitudes', 'longitudes', 'RP_difference']
+    gw_df7.set_index('county_ID')
+    gw_df7.to_csv('GW_change_2015.csv')
     return RP_difference, lats, lons , year_range_string
 
 
@@ -179,6 +187,8 @@ def average_depth_5year_comparison(year_evaluating):
     lons[:] = np.nan
     RP_difference = np.empty(len(tulare_county_IDs_all))
     RP_difference[:] = np.nan
+    county_id5 = np.empty(len(tulare_county_IDs_all))
+    county_id5[:] = np.nan
 
     well_iter = 0 
     for county_id in tqdm(tulare_county_IDs_all): 
@@ -205,6 +215,7 @@ def average_depth_5year_comparison(year_evaluating):
 
         lon_test = tulare_county_headers.loc[tulare_county_headers.index == county_id,:] 
         lons[well_iter] = lon_test.LONGITUDE.values
+        county_id5[well_iter] = county_id
 
         RP_difference[well_iter] = RP_average - RP_average_prior  # If the water is depleting, this number should be increasing 
         if RP_difference[well_iter] > 100:  # takes out outliers
@@ -213,7 +224,15 @@ def average_depth_5year_comparison(year_evaluating):
         well_iter = well_iter + 1
         # pdb.set_trace()
 
-    return RP_difference, lats, lons, year_range_string
+    gw_array7 = np.vstack((county_id5, lats, lons, RP_difference))
+    gw_array7 = np.transpose(gw_array7)
+    gw_df7 = pd.DataFrame(gw_array7)
+    gw_df7.columns = ['county_ID', 'latitudes', 'longitudes', 'RP_difference']
+    gw_df7.set_index('county_ID')  # fix id value 
+    gw_df7.to_csv('GW_change_2015.csv')
+    # pdb.set_trace()
+
+    return RP_difference, lats, lons, year_range_string, county_id5
 
 
 plotting_test_2013 = 0
@@ -518,8 +537,6 @@ if compiling_seasonal_averages == 1:
     np.savetxt("seasonal_averages.csv", seasonal_average, delimiter=",")
     np.savetxt("seasonal_averages_corresponding_IDs.csv", tulare_county_IDs_all, delimiter=",")
 
-# pdb.set_trace()
-# plt.show()
 s1 = tulare_wells16.SITE_CODE  
 s2 = tulare_wells13.SITE_CODE
 s1 == s2   # sanity check 
@@ -551,26 +568,14 @@ if groundwater_map1 == 1:
 
     m.drawmapboundary(fill_color='steelblue', zorder=-99)
     m.arcgisimage(service='ESRI_StreetMap_World_2D', xpixels = 5000, dpi=5000, verbose= True)
-    # m.arcgisimage(service='World_Street_Map', xpixels = 18000, dpi=4000, verbose= True)
-    # m.arcgisimage(service='World_Transportation', xpixels=1000, dpi=75, verbose= True)
-    # m.drawcounties(linewidth=0.1, color='gray')
     m.drawstates(zorder=6, color='gray')
     m.drawcountries(zorder=6, color='gray')
     m.drawcoastlines(color='gray')
-    # load reservoir data and scatterplot (lat,lon,elev)
-    # df = pd.read_csv('all-reservoirs.csv')
-    # lons = df.Longitude.values
-    # lats = df.Latitude.values
-    # elev = df.Elevation.values
 
     x,y = m(lons,lats)
-
-    # sdlfkj = mplc.Colormap('RdYlBu')
     variable_object = plt.cm.get_cmap('RdYlGn')
     m.scatter(x,y,s=30,c=water_drawdown_changes, marker='o', edgecolor='None', cmap=variable_object)
     plt.colorbar()
-
-    # add in demographics eventually?
 
     # plt.savefig('map.svg')
     plt.show()
@@ -611,7 +616,7 @@ if groundwater_map2 == 1:
     plt.show()
     # pdb.set_trace()
 
-groundwater_map3 = 0
+groundwater_map3 = 1
 if groundwater_map3 ==1:
     RP_difference, lats, lons, range_string = average_depth_year_comparison(2016)
     print(range_string)
@@ -637,7 +642,7 @@ if groundwater_map3 ==1:
 
 groundwater_map7 = 1 # - attempt2  set colorbar scale plots the average for the 5 years leading up, and the previous 5
 if groundwater_map7 ==1:
-    RP_difference, lats, lons, range_string = average_depth_5year_comparison(2015)
+    RP_difference, lats, lons, range_string, county_id5t = average_depth_5year_comparison(2015)
 
     print(range_string)
     # create map background  
@@ -661,21 +666,6 @@ if groundwater_map7 ==1:
     plt.show()
     pdb.set_trace()
 
-    ##################Fix this section to make a clean CSV file - then add to the function ######################
-    # gw_array7 = {'latitudes' : pd.Series([lats]), 'longitudes' : pd.Series([lons]), 'RP_difference' : pd.Series([RP_difference]) } 
-    lons7 = lons
-    lats7 = lats
-
-    gw_array7 = np.vstack((lats, lons, RP_difference))
-    gw_array7 = np.transpose(gw_array7)
-    # gw_array7 = np.array([[lats], [lons], [RP_difference]])
-    gw_df7 = pd.DataFrame(gw_array7)
-    gw_df7.columns = ['latitudes', 'longitudes', 'RP_difference']
-    gw_df7.to_csv('GW_change_2015.csv')
-    pdb.set_trace()
-
-    # change_year_before = tulare_wells18.change_from_year_prior.values # FIX THIS - Should use tulare_wells2 or tulare_wells_oct # depends on date entered for recent timeframe - tulare_wells10  - originally tulare_wells18
-    #############################################################################################################
 
 attempt_all_irrigation = 1  #plots all months of irrigation averages by season 
 if attempt_all_irrigation ==1:

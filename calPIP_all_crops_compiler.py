@@ -45,7 +45,7 @@ def calPIP_summed(year):
         crop_type_vals = calPIP_data.loc[lambda df: calPIP_data.SITE_NAME == crop_type, : ]  # pulls permits for each of the crop types (filters for only this crop)
         no_location_IDs = len(crop_type_vals.SITE_LOCATION_ID.unique()) # number of unique parcel IDs for specific crop 
         ## ^ Edit location ID search - test for different SITE_LOCATION_ID
-
+        number_of_null_site_location_ids = sum(pd.isnull(crop_type_vals.SITE_LOCATION_ID))
 
         COMTRS_list = crop_type_vals.COMTRS.unique()
         no_COMTRS = len(crop_type_vals.COMTRS.unique())   # number of unique COMTRS that grow specific crop 
@@ -53,7 +53,7 @@ def calPIP_summed(year):
         crop_column = column_list[crop_iter]
         crop_iter = crop_iter + 1
 
-        save_crop_file = 0 
+        save_crop_file = 1 
         if save_crop_file == 1:
             path='/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages'
             crop_type_vals.to_csv(os.path.join(path, (crop_column +  '_all.csv') ) , header = True, na_rep = '0', index = False)   
@@ -69,25 +69,18 @@ def calPIP_summed(year):
                 total_acres = parcels_in_COMTRS.AMOUNT_PLANTED.iloc[0]   # if only 1 value, just use that value 
             else:
                 parcel_IDs = parcels_in_COMTRS.SITE_LOCATION_ID.unique()  # array of unique parcel values in section
+                no_parcels = len(parcel_IDs)   # number of parcels within the COMTRS
+                acreages_for_each_site_loc = np.zeros([no_parcels, 1])  # empty array for the summed acreage for each parcel (site location)
+                parcel_iter = 0 
                 for individual_site in parcel_IDs: #goes through the individual sites in the secition 
-                    single_acreage = parcels_in_COMTRS.loc[parcels_in_COMTRS.SITE_LOCATION_ID == individual_site] # locates all permits a specific site
-                    total_acres = max(single_acreage.AMOUNT_PLANTED)
-                    if isnull(individual_site) == True
-
-                acres = parcels_in_COMTRS.AMOUNT_PLANTED.unique()   ###### put a check here to make sure they are separate parcels - use SITE_LOCATION_ID
-                # for each unique 
-
-                total_acres = sum(acres)   # adds up unique crop areas 
-                # If they have the same location ID, take the maximum value within that area
-                # pdb.set_trace()
-                # In this loop, put each acreage value in the crop4_df overall dataframe using iloc ??
-crop_type_vals.SITE_LOCATION_ID.loc[crop_type_vals.SITE_LOCATION_ID== Nan]
- test = crop_type_vals.SITE_LOCATION_ID.loc[crop_type_vals.SITE_LOCATION_ID== 'NaN']
-                site_locations_unique = SITE_LOCATION_ID.unique()
-                # for individual_site in site_locations_unique:
-                    # something about how IF the SITE_LOCATION_ID is the same for multiple permits in the section, combine them? 
-                        # For each unique acreage value, find all the site_location_IDs 
-                    pdb.set_trace()
+                    specific_parcel = parcels_in_COMTRS.loc[parcels_in_COMTRS.SITE_LOCATION_ID == individual_site] # locates all permits a specific site
+                    total_at_site_loc = max(specific_parcel.AMOUNT_PLANTED)  # maximum acreage reported for that SITE_LOCATION_ID 
+                    if pd.isnull(individual_site) == True or individual_site == np.nan:   # If site_ID is not labelled
+                        total_at_site_loc = sum(specific_parcel.AMOUNT_PLANTED.unique()) # sum up all unique area values
+                    acreages_for_each_site_loc[parcel_iter] = total_at_site_loc
+                    total_acres = sum(acreages_for_each_site_loc)
+                    parcel_iter = parcel_iter + 1 
+                        # pdb.set_trace()
 
             crop_acres_list[COMTRS_iter] = total_acres
             COMTRS_iter = COMTRS_iter + 1 
@@ -112,9 +105,17 @@ crop_type_vals.SITE_LOCATION_ID.loc[crop_type_vals.SITE_LOCATION_ID== Nan]
     path_name = os.path.join(directory, (str(year) + '_all_crops.csv')) 
     crop5_df.to_csv(os.path.join(directory, (str(year) + '_all_crops.csv')), header = True, na_rep = '0', index = False)
     print(f'Saved compiled {year} data in {path_name}')
-
-    return crop5_df, crop2_df 
     pdb.set_trace()
 
+    return crop5_df, crop2_df 
+
+
+    # Next steps: 
+        # for 2007_all_crops, sum the acreage for each crop type
+        # locate the column position of top 10 crops 
+        # for each of these crops, sum up the acres for each county  
 
 calPIP_summed(2007)
+pdb.set_trace()
+
+

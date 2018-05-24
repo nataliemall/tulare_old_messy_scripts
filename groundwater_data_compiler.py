@@ -616,7 +616,7 @@ if groundwater_map2 == 1:
     plt.show()
     # pdb.set_trace()
 
-groundwater_map3 = 1
+groundwater_map3 = 0
 if groundwater_map3 ==1:
     RP_difference, lats, lons, range_string = average_depth_year_comparison(2016)
     print(range_string)
@@ -640,7 +640,7 @@ if groundwater_map3 ==1:
 
     plt.show()
 
-groundwater_map7 = 1 # - attempt2  set colorbar scale plots the average for the 5 years leading up, and the previous 5
+groundwater_map7 = 0 # - attempt2  set colorbar scale plots the average for the 5 years leading up, and the previous 5
 if groundwater_map7 ==1:
     RP_difference, lats, lons, range_string, county_id5t = average_depth_5year_comparison(2015)
 

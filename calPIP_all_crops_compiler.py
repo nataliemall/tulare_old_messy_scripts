@@ -24,6 +24,7 @@ def calPIP_summed(year):
 
         crop_list = calPIP_data.SITE_NAME.unique()
         column_list = []
+        # pdb.set_trace()
         return crop_list, column_list, calPIP_data
 
     def clean_columns():  # clean column names - remove slashes and spaces
@@ -33,19 +34,21 @@ def calPIP_summed(year):
                 crop_cleaned = str(crop_type)
                 column_list.append(crop_cleaned)
             else:
-                crop_strings = str(crop_type[0:15] + ' acres')
+                crop_strings = str(crop_type[0:20] + ' acres')
                 crop_cleaned = crop_strings.replace("/", "_")  # transform these names by replacing '/' with '_' 
                 column_list.append(crop_cleaned)
+        # pdb.set_trace()
         return column_list
 
     def make_dataframe(year): # make dataframe for the crop acreage summations 
         all_COMTRS = calPIP_data.COMTRS.unique()
-        array_zeros1 = np.full((len(all_COMTRS), len(crop_list)), np.zeros) #array of zeros for dataset
+        array_zeros1 = np.full((len(all_COMTRS), len(crop_list)), 0) #array of zeros for dataset
         crop4_df = pd.DataFrame(array_zeros1, index = [all_COMTRS], columns = [ column_list ] )   # makes overall dataframe for all crop types 
         array_tulare = np.full((1, 1), 0)
         tulare_overall_by_crop = pd.DataFrame(array_tulare, columns = ['year'])
-        pdb.set_trace()
+        # pdb.set_trace()
         tulare_overall_by_crop['year'] = year 
+        # pdb.set_trace()
         return crop4_df, tulare_overall_by_crop 
 
     def acreage_compiler(crop_type, crop_iter):  # compiles acreage for each COMTRS location and stores the data 
@@ -64,9 +67,23 @@ def calPIP_summed(year):
 
         save_crop_file = 1 
         if save_crop_file == 1:
-            path='/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages'
-            crop_type_vals.to_csv(os.path.join(path, (crop_column +  '_all.csv') ) , header = True, na_rep = '0', index = False)   
+            # path='/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages'
+            # directory_overall_folder 
+            if os.path.isdir("/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages"):
+                print('folder does exist')
+            else:
+                os.mkdir('/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages')
+                print('Created calPIP_crop_acreages folder')
 
+
+            # pdb.set_trace()
+            directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages', str(year) + 'files' )
+            try: # puts in file if folder already exists
+                crop_type_vals.to_csv(os.path.join(directory, (crop_column +  '_all.csv') ) , header = True, na_rep = '0', index = False)   
+            except: # creates file folder and puts in values if folder does not yet exist 
+                # pdb.set_trace()
+                os.mkdir(directory) 
+                crop_type_vals.to_csv(os.path.join(directory, (crop_column +  '_all.csv') ) , header = True, na_rep = '0', index = False)   
         array_zeros = np.zeros([no_COMTRS, 1])  # array of the length of COMTRS for alfalfa
         crop2_df = pd.DataFrame(array_zeros, index = [COMTRS_list], columns = [str(crop_column)] )   # change column label to each type of crop 
         COMTRS_iter = 0 
@@ -78,7 +95,7 @@ def calPIP_summed(year):
 
             # if crop_type_vals
             if len(parcels_in_COMTRS.SITE_LOCATION_ID.unique()) == 1: 
-                total_acres = parcels_in_COMTRS.AMOUNT_PLANTED.iloc[0]   # if only 1 value, just use that value 
+                total_in_COMTRS = parcels_in_COMTRS.AMOUNT_PLANTED.iloc[0]   # if only 1 value, just use that value 
             else:
                 parcel_IDs = parcels_in_COMTRS.SITE_LOCATION_ID.unique()  # array of unique parcel values in section
                 no_parcels = len(parcel_IDs)   # number of parcels within the COMTRS
@@ -86,21 +103,31 @@ def calPIP_summed(year):
                 parcel_iter = 0 
                 for individual_site in parcel_IDs: #goes through the individual sites in the secition 
                     specific_parcel = parcels_in_COMTRS.loc[parcels_in_COMTRS.SITE_LOCATION_ID == individual_site] # locates all permits a specific site
-                    total_at_site_loc = max(specific_parcel.AMOUNT_PLANTED)  # maximum acreage reported for that SITE_LOCATION_ID 
+                    # if specific_parcel.AMOUNT_PLANTED
+                    try:
+                        total_at_site_loc = max(specific_parcel.AMOUNT_PLANTED)  # maximum acreage reported for that SITE_LOCATION_ID 
+                    except: 
+                        total_at_site_loc = 0 
+                        print(f'No value for amount planted at COMTRS {COMTRS_value} at parcel {individual_site}')
                     if pd.isnull(individual_site) == True or individual_site == np.nan:   # If site_ID is not labelled
                         total_at_site_loc = sum(specific_parcel.AMOUNT_PLANTED.unique()) # sum up all unique area values
                     acreages_for_each_site_loc[parcel_iter] = total_at_site_loc
-                    total_acres = sum(acreages_for_each_site_loc)
+                    total_in_COMTRS = sum(acreages_for_each_site_loc)
                     parcel_iter = parcel_iter + 1 
                         # pdb.set_trace()
 
             # pdb.set_trace()
-            COMTRS_county = parcels_in_COMTRS.COUNTY_NAME.reset_index().COUNTY_NAME[0]
+            if np.size(parcels_in_COMTRS.COUNTY_NAME) >= 1:
+                COMTRS_county = parcels_in_COMTRS.COUNTY_NAME.reset_index().COUNTY_NAME[0]  # FIX THIS 
+            else:
+                COMTRS_county = 'unknown due to no matching COMTRS'
+                print('skipped due to no matching COMTRS')
+                total_in_COMTRS = 0 
             # pdb.set_trace()
-            if COMTRS_county == 'TULARE':
-                crop_acres_tulare = crop_acres_tulare + total_acres
+            if COMTRS_county == 'TULARE' and total_in_COMTRS > 0:
+                    crop_acres_tulare = crop_acres_tulare + total_in_COMTRS
 
-            crop_acres_list[COMTRS_iter] = total_acres
+            crop_acres_list[COMTRS_iter] = total_in_COMTRS
             COMTRS_iter = COMTRS_iter + 1 
 
         crop2_df[lambda crop2_df: crop2_df.columns[0]] = crop_acres_list  # crop acreage list for this specific crop 
@@ -113,16 +140,16 @@ def calPIP_summed(year):
             crop3_df.columns = ['COMTRS', crop_column]
             directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages', str(year) + 'files' )
             try: 
-                crop3_df.to_csv(os.path.join(directory, (str(year) + crop_column + '.csv' ) ), header = True, na_rep = '0', index = False)   
+                crop3_df.to_csv(os.path.join(directory, (str(year) + crop_column + '_by_COMTRS'+ '.csv' ) ), header = True, na_rep = '0', index = False)   
             except: 
                 os.mkdir(directory) 
-                crop3_df.to_csv(os.path.join(directory, (str(year) + crop_column + '.csv' ) ), header = True, na_rep = '0', index = False)
+                crop3_df.to_csv(os.path.join(directory, (str(year) + crop_column + '_by_COMTRS' + '.csv' ) ), header = True, na_rep = '0', index = False)
         return crop2_df, directory, crop_column, crop_iter, crop_acres_tulare
 
     def save_overall_dataframe(crop4_df):
         crop5_df = crop4_df.reset_index()
-        path_name = os.path.join(directory, (str(year) + '_all_crops.csv')) 
-        crop5_df.to_csv(os.path.join(directory, (str(year) + '_all_crops.csv')), header = True, na_rep = '0', index = False)
+        path_name = os.path.join(directory, (str(year) + '_all_crops_compiled.csv')) 
+        crop5_df.to_csv( path_name, header = True, na_rep = '0', index = False)
         print(f'Saved compiled {year} data in {path_name}')
         # pdb.set_trace()
 
@@ -130,28 +157,49 @@ def calPIP_summed(year):
     column_list = clean_columns()         # clean column names - remove slashes and spaces 
     crop4_df, tulare_overall_by_crop = make_dataframe(year)           # make dataframe for the crop acreage summations     
     
+    # pdb.set_trace()
 
     crop_iter = 0 
-    for crop_type in tqdm(crop_list[0:4]):  # Runs for each crop type in calPIP database, then connects to larger calPIP array using COMTRS index 
+    for crop_type in tqdm(crop_list):  # Runs for each crop type in calPIP database, then connects to larger calPIP array using COMTRS index 
         crop2_df, directory, crop_column, crop_iter, crop_acres_tulare = acreage_compiler(crop_type, crop_iter)  # sum up acreages for each crop type 
         crop4_df[crop_column] = crop2_df[crop_column].loc[crop2_df.index]  # Puts the individual crop acreage list into the overall dataframe crop4_df 
         tulare_overall_by_crop[crop_column] = crop_acres_tulare
-        pdb.set_trace()
+        # pdb.set_trace()
 
     save_overall_dataframe(crop4_df)
 
+    tulare_overall_by_crop = tulare_overall_by_crop.transpose()
+    tulare_overall_by_crop = tulare_overall_by_crop.rename(columns=tulare_overall_by_crop.iloc[0])
+    tulare_overall_by_crop = tulare_overall_by_crop.reindex(tulare_overall_by_crop.index.drop('year'))
 
-    # return crop5_df, crop2_df 
-
-
-    # Next steps: 
-        # for 2007_all_crops, sum the acreage for each crop type
-        # locate the column position of top 10 crops 
-        # for each of these crops, sum up the acres for each county  
-    
     return tulare_overall_by_crop
 
-tulare_overall_by_crop = calPIP_summed(2007)
+# tulare_overall_by_crop = calPIP_summed(2007)  ## STOP
+
+### STOP HERE
+# tulare_overall_by_crop_2008 = calPIP_summed(2008)
+# - to combine - flip - make crop type the index, and append using crop_type as the index
+# result = pd.concat([tulare_overall_by_crop, tulare_overall_by_crop_2008], axis=1)
+
+# tulare_overall_by_crop = calPIP_summed(2003)
+
+a = {}
+iter = 0 
+for year2 in tqdm(range(1990,2016)):
+    a[year2] = calPIP_summed(year2) 
+    if iter > 0: 
+        result = pd.concat([result, a[year2]], axis=1)
+    else: 
+        result = a[year2]
+
+    iter = iter + 1
+
+result.to_csv('/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages/overall_results.csv', header = True, na_rep = '0', sep = '\t') 
+
+
+
+
+
 
 pdb.set_trace()
 

@@ -1,4 +1,7 @@
  # Well data analysis - Change in groundwater levels 
+
+# http://wdl.water.ca.gov/waterdatalibrary/groundwater/index.cfm
+# Same data reported here: 
 # https://www.casgem.water.ca.gov/OSS/(S(q4ytwloehqreoahtlcw0z1ia))/Public/SearchWells.aspx
 # takes data received from CASGEM and compiles it to plot lift heights and groundwater changes over time for all of  Tulare Lake Basin
 
@@ -263,8 +266,13 @@ plotting_test_2013 = 0
 if plotting_test_2013 == 1: 
     RP_difference, lats, lons, date_range_string = average_depth_year_comparison(2013)
 
-compiling_seasonal_averages = 1 # takes the data and compiles average RP_READING for each season (set equal to 1 if this hasn't already been done)
+compiling_seasonal_averages = 0 # takes the data and compiles average RP_READING for each season (set equal to 1 if this hasn't already been done)
 # doesn't currently work if set to zero (some variables won't be defined)
+
+# Goal: create a fuction that compiles the seasonal average right here 
+
+
+
 if compiling_seasonal_averages == 1: 
     # Variables for yearly averages data 
     seasonal_average = np.empty((len(tulare_county_IDs_all),158,))
@@ -273,7 +281,7 @@ if compiling_seasonal_averages == 1:
     year_range = np.arange(1940,2018)
 
 # import_seasonal_averages = 1
-if compiling_seasonal_averages == 0:
+if compiling_seasonal_averages == 0:  # no longer compiling averates since the file is already there 
     imported_seasonal_averages = np.loadtxt('seasonal_averages.csv', delimiter=',')  # array of all 2147 wells in Tulare county, averaged by season 
 
 # pdb.set_trace()
@@ -560,11 +568,12 @@ def seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tula
                 plt.legend()  
 
             return r
-        if compiling_seasonal_averages == 0: 
+        if compiling_seasonal_averages == 0: # function runs if seasonal averages have already been compiled 
             r = import_seasonal_average(r)
+            seasonal_average = 'Test- seasonal_average is already saved in the csv file'
     # Save seasonal_averages to a .csv file
 
-    return seasonal_average, well_iter, tulare_wells13
+    return seasonal_average, well_iter, tulare_wells13, tulare_wells16
 
 seasonal_average, well_iter, tulare_wells13, tulare_wells16 = seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tulare_wells16, v, r)
 if compiling_seasonal_averages == 1:
@@ -576,33 +585,40 @@ s1 = tulare_wells16.SITE_CODE
 s2 = tulare_wells13.SITE_CODE
 s1 == s2   # sanity check 
 
-# Add tulare_wells13 columns to tulare_wells16 
-tulare_wells17 = pd.merge(tulare_wells13, tulare_wells16)
+def water_drawdown_changes_1980_85():
+    # Add tulare_wells13 columns to tulare_wells16 
+    tulare_wells17 = pd.merge(tulare_wells13, tulare_wells16)
 
-# CASGEM_STATION_ID
-water_level_ave_80_85.CASGEM_STATION_ID = array_80_85_wellIDs[0:len(tulare_wells17)] 
-# water_level_ave_80_85.CASGEM_STATION_ID = water_level_ave_80_85.CASGEM_STATION_ID.tolist() # adds the station ID to the df 
-water_level_ave_80_85.ave_80_85 = array_80_85[0:len(tulare_wells17)]  # these values need to be inversed 
-# pdb.set_trace()
+    # CASGEM_STATION_ID
+    water_level_ave_80_85.CASGEM_STATION_ID = array_80_85_wellIDs[0:len(tulare_wells17)] 
+    # water_level_ave_80_85.CASGEM_STATION_ID = water_level_ave_80_85.CASGEM_STATION_ID.tolist() # adds the station ID to the df 
+    water_level_ave_80_85.ave_80_85 = array_80_85[0:len(tulare_wells17)]  # these values need to be inversed 
+    # pdb.set_trace()
 
-tulare_wells18 = pd.merge(tulare_wells17, water_level_ave_80_85)  # merges the average vals with tulare_wells17 
-tulare_wells18['RP_change'] = tulare_wells18.RP_READING - tulare_wells18.ave_80_85  # smaller RP means water closer to surface
+    tulare_wells18 = pd.merge(tulare_wells17, water_level_ave_80_85)  # merges the average vals with tulare_wells17 
+    tulare_wells18['RP_change'] = tulare_wells18.RP_READING - tulare_wells18.ave_80_85  # smaller RP means water closer to surface
 
-water_drawdown_changes = tulare_wells18.RP_change.values
-change_year_before = tulare_wells18.change_from_year_prior.values # FIX THIS - Should use tulare_wells2 or tulare_wells_oct # depends on date entered for recent timeframe - tulare_wells10  - originally tulare_wells18
-lats = tulare_wells18.LATITUDE.values
-lons = tulare_wells18.LONGITUDE.values
+    water_drawdown_changes = tulare_wells18.RP_change.values
+    change_year_before = tulare_wells18.change_from_year_prior.values # FIX THIS - Should use tulare_wells2 or tulare_wells_oct # depends on date entered for recent timeframe - tulare_wells10  - originally tulare_wells18
+    lats = tulare_wells18.LATITUDE.values
+    lons = tulare_wells18.LONGITUDE.values
+    return water_drawdown_changes, change_year_before, lats, lons 
 
-############# plotting the GW change  #############
-groundwater_map1 = 0  # Groundwater plotting of (historical data average - 2012 levels)
-if groundwater_map1 == 1:
+water_drawdown_changes, change_year_before, lats, lons = water_drawdown_changes_1980_85()
+pdb.set_trace()
+
+def gw_map_changes():
+
+    ############# plotting the GW change  #############
+    # Groundwater plotting of (historical data average - 2012 levels)
+
     # create map background  
     plt.figure(3)
     m = Basemap(llcrnrlon=-125.6, llcrnrlat=31.7, urcrnrlon=-113.2,
                 urcrnrlat=43.2, projection='cyl', resolution='i', area_thresh=25000.0)
 
     m.drawmapboundary(fill_color='steelblue', zorder=-99)
-    m.arcgisimage(service='ESRI_StreetMap_World_2D', xpixels = 5000, dpi=5000, verbose= True)
+    m.arcgisimage(service='ESRI_StreetMap_World_2D', xpixels = 5000, dpi=500, verbose= True)
     m.drawstates(zorder=6, color='gray')
     m.drawcountries(zorder=6, color='gray')
     m.drawcoastlines(color='gray')
@@ -615,6 +631,9 @@ if groundwater_map1 == 1:
     # plt.savefig('map.svg')
     plt.show()
     # pdb.set_trace()
+gw_map_changes()
+print('paused here after making the first graph ')
+pdb.set_trace()
 
 groundwater_map2 = 0  # Groundwater plotting of changes in water level from year prior -  for a certain year - set-up for only years with historical data
 # currently using change_year_before file 
@@ -675,18 +694,20 @@ if groundwater_map3 ==1:
 
     plt.show()
 
-groundwater_map7 = 0 # - attempt2  set colorbar scale plots the average for the 5 years leading up, and the previous 5
+groundwater_map7 = 1 # - attempt2  set colorbar scale plots the average for the 5 years leading up, and the previous 5
 if groundwater_map7 ==1:
-    RP_difference, lats, lons, range_string, county_id5t = average_depth_5year_comparison(2015)
+    RP_difference, lats, lons, range_string, county_id5 = average_depth_5year_comparison(2015)
 
     print(range_string)
+    print('pause here')
+    pdb.set_trace()
     # create map background  
     plt.figure(16)
     m = Basemap(llcrnrlon=-125.6, llcrnrlat=31.7, urcrnrlon=-113.2,
                 urcrnrlat=43.2, projection='cyl', resolution='f', area_thresh=25000.0)  # change resolution to 'high' l
 
     m.drawmapboundary(fill_color='steelblue', zorder=-99)
-    m.arcgisimage(service='ESRI_StreetMap_World_2D', xpixels = 10000, dpi=1000, verbose= True)
+    m.arcgisimage(service='ESRI_StreetMap_World_2D', xpixels = 1000, dpi=500, verbose= True)
     m.drawstates(zorder=6, color='gray')
     m.drawcountries(zorder=6, color='gray')
     m.drawcoastlines(color='gray')

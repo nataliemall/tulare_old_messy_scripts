@@ -77,7 +77,7 @@ def get_CASGEM_data():
 
         return well_data_tulare_only
 
-    def data_without_annual_lift_changes():   
+    def data_without_annual_lift_changes():  
         try:   # Runs this if data already exists in correct folder 
         # if include_elevation_changes == 1:  # CSV includes elevation changes from year prior 
             # well_data_tulare_only = pd.read_csv('well_data_tulare_only2.csv', parse_dates=['MEASUREMENT_DATE'])
@@ -104,8 +104,8 @@ def get_CASGEM_data():
 
     return well_data_tulare_only, tulare_county_headers, tulare_county_IDs_all
 
-
 well_data_tulare_only, tulare_county_headers, tulare_county_IDs_all = get_CASGEM_data()
+
 pdb.set_trace()
 
 # variables for comparing historical with 2012 data: 
@@ -128,10 +128,8 @@ water_level_ave_80_85 = pd.DataFrame(columns = elevation_column) # create datafr
 array_80_85 = np.zeros(1000)
 array_80_85_wellIDs = np.zeros(1000, dtype=np.int32)
 
-############ ATTEMPT TO MAKE FUNCTION #############
-# pdb.set_trace()
 
-def average_depth_year_comparison(year_evaluating):
+def average_depth_year_comparison(year_evaluating):   #compares a given year with the year before
 
     # year = year_evaluating - 1
     water_year_start = str(year_evaluating -1) + '-10-01 00:00:00'  # start of water year: Oct 1 of previos year 
@@ -196,17 +194,20 @@ def average_depth_year_comparison(year_evaluating):
     return RP_difference, lats, lons , year_range_string
 
 
-def average_depth_5year_comparison(year_evaluating):
+def average_depth_5year_comparison(year_evaluating):  # Compares 5 years (averaged) with the average of the 5 years prior
 
     # year = year_evaluating - 1
-    water_year_start = str(year_evaluating -6) + '-10-01 00:00:00'  # start of water year: Oct 1 of previos year 
+    water_year_start = str(year_evaluating -5) + '-10-01 00:00:00'  # start of water year: Oct 1 of previos year 
     water_year_end = str(year_evaluating) + '-09-30 00:00:00'
     year_prior_start =  str(year_evaluating - 10) + '-10-01 00:00:00'
-    year_prior_end =  str(year_evaluating  - 6) + '-09-30 00:00:00'
+    year_prior_end =  str(year_evaluating  - 5) + '-09-30 00:00:00'
 
     starting = str(pd.to_datetime(year_prior_start).year)
     ending = str(pd.to_datetime(water_year_end).year)
-
+    print('experiment with plot_title here')
+    pdb.set_trace()
+    plot_title = str(str(year_evaluating -5) + '-' + str(year_evaluating) + ' Groundwater Level Average Compared with ' + str(year_evaluating -10) + '-' + str(year_evaluating -5))
+    
     year_range_string = ('Water level difference in October',starting,'through September', ending)
     lats = np.empty(len(tulare_county_IDs_all))
     lats[:] = np.nan
@@ -259,32 +260,14 @@ def average_depth_5year_comparison(year_evaluating):
     gw_df7.to_csv('GW_change_2015.csv')
     # pdb.set_trace()
 
-    return RP_difference, lats, lons, year_range_string, county_id5
+    return RP_difference, lats, lons, year_range_string, county_id5, plot_title 
 
 
 plotting_test_2013 = 0
 if plotting_test_2013 == 1: 
     RP_difference, lats, lons, date_range_string = average_depth_year_comparison(2013)
 
-compiling_seasonal_averages = 0 # takes the data and compiles average RP_READING for each season (set equal to 1 if this hasn't already been done)
-# doesn't currently work if set to zero (some variables won't be defined)
 
-# Goal: create a fuction that compiles the seasonal average right here 
-
-
-
-if compiling_seasonal_averages == 1: 
-    # Variables for yearly averages data 
-    seasonal_average = np.empty((len(tulare_county_IDs_all),158,))
-    seasonal_average[:] = np.nan
-    seasonal_average[0] = 0  
-    year_range = np.arange(1940,2018)
-
-# import_seasonal_averages = 1
-if compiling_seasonal_averages == 0:  # no longer compiling averates since the file is already there 
-    imported_seasonal_averages = np.loadtxt('seasonal_averages.csv', delimiter=',')  # array of all 2147 wells in Tulare county, averaged by season 
-
-# pdb.set_trace()
 v = 0 
 plt_legend = np.ones(50)
 
@@ -296,54 +279,85 @@ Y_irrigation[:] = np.nan
 r = 0 
 
 well_iter = 0 
-# Iterates through each of the well IDs in Tulare County 
 
+
+# Function that compiles the seasonal average right here 
+def compile_seasonal_averages():
+    print('Compiling seasonal averages- please wait')
+    # Variables for yearly averages data 
+    seasonal_average = np.empty((len(tulare_county_IDs_all),158,))
+    seasonal_average[:] = np.nan
+    seasonal_average[0] = 0  
+    year_range = np.arange(1940,2018)
+    well_iter = 0 
+
+    for county_id in tqdm(tulare_county_IDs_all):   # runs through data for all Tulare County IDs 
+        #Data for this specific well ID: 
+        tulare_wells90 = well_data_tulare_only.loc[well_data_tulare_only['CASGEM_STATION_ID'] == county_id, :]
+
+        season_iter = 0 
+        for year in year_range:
+            tulare_well_ID_year = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'].dt.year == year - 1 , :]
+            tulare_well_ID_year = tulare_well_ID_year.loc[tulare_well_ID_year['MEASUREMENT_DATE'].dt.month > 9, :]  # locate data betwwen october and May of year prior
+            
+            tulare_well_ID_year_part2 = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'].dt.year == year, :]  # second half of rainy season
+            tulare_well_ID_year_part2 = tulare_well_ID_year_part2.loc[tulare_well_ID_year_part2['MEASUREMENT_DATE'].dt.month < 5, :]  # before May 
+            # pdb.set_trace()
+
+            # tulare_rainy_combined = np.append(tulare_well_ID_year.RP_READING, tulare_well_ID_year_part2.RP_READING) # combines the season 
+            # pdb.set_trace()
+            part1 = tulare_well_ID_year.RP_READING.values
+            part2 = tulare_well_ID_year_part2.RP_READING.values
+            # pdb.set_trace()
+
+            combined = np.append(part1, part2)
+            average_rainy = np.empty(1)
+            average_rainy[:] = np.nan
+            if combined.size > 0:
+                average_rainy = np.mean(combined)
+            seasonal_average[well_iter, season_iter] = average_rainy  # compiles average for the rainy season and places it in seasonal_average dataframe
+
+            # Dry season 
+            tulare_well_ID_year_dry  = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'].dt.year == year, :]
+            tulare_well_ID_year_dry  = tulare_well_ID_year_dry.loc[tulare_well_ID_year_dry['MEASUREMENT_DATE'].dt.month > 4, :]  # locate data betwwen october and May year + 1
+            tulare_well_ID_year_dry  = tulare_well_ID_year_dry.loc[tulare_well_ID_year_dry['MEASUREMENT_DATE'].dt.month < 10, :]  # locate data betwwen october and May year + 1
+
+            dry_season_values = tulare_well_ID_year_dry.RP_READING.values 
+
+            if dry_season_values.size > 0:
+                seasonal_average[well_iter, season_iter + 1] = np.mean(tulare_well_ID_year_dry.RP_READING)
+
+            season_iter = season_iter + 2
+
+        well_iter = well_iter + 1  
+        # pdb.set_trace()
+    
+    np.savetxt("seasonal_averages.csv", seasonal_average, delimiter=",")
+    np.savetxt("seasonal_averages_corresponding_IDs.csv", tulare_county_IDs_all, delimiter=",")
+
+def import_seasonal_averages():
+    imported_seasonal_averages = np.loadtxt('seasonal_averages.csv', delimiter=',')  # array of all 2147 wells in Tulare county, averaged by season 
+
+    return imported_seasonal_averages 
+
+# Compile the data (set equal to zero if already done)
+compiling_seasonal_averages = 0 # takes the data and compiles average RP_READING for each season (set equal to 1 if this hasn't already been done)
+if compiling_seasonal_averages == 1:    # Compiles seasonal averages of the data and saves it as "seasonal_averages.csv"
+    compile_seasonal_averages()
+
+# import the data necessary 
+imported_seasonal_averages = import_seasonal_averages()   # imports the seasonal average data as imported_seasonal_averages
+pdb.set_trace()
+
+# Iterates through each of the well IDs in Tulare County 
 def seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tulare_wells16, v, r):
     for county_id in tqdm(tulare_county_IDs_all):   # runs through data for all Tulare County IDs 
         #Data for this specific well ID: 
         tulare_wells90 = well_data_tulare_only.loc[well_data_tulare_only['CASGEM_STATION_ID'] == county_id, :]
 
-        if compiling_seasonal_averages == 1:  # Will iterate through the years if compilation hasn't already been done
-            # Yearly averages data collection: 
-            season_iter = 0 
-            for year in year_range:
-                tulare_well_ID_year = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'].dt.year == year - 1 , :]
-                tulare_well_ID_year = tulare_well_ID_year.loc[tulare_well_ID_year['MEASUREMENT_DATE'].dt.month > 9, :]  # locate data betwwen october and May of year prior
-                
-                tulare_well_ID_year_part2 = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'].dt.year == year, :]  # second half of rainy season
-                tulare_well_ID_year_part2 = tulare_well_ID_year_part2.loc[tulare_well_ID_year_part2['MEASUREMENT_DATE'].dt.month < 5, :]  # before May 
-                # pdb.set_trace()
+        well_iter = well_iter + 1 
+        seasonal_average_test = 'no longer calculated in this section'
 
-                # tulare_rainy_combined = np.append(tulare_well_ID_year.RP_READING, tulare_well_ID_year_part2.RP_READING) # combines the season 
-                # pdb.set_trace()
-                part1 = tulare_well_ID_year.RP_READING.values
-                part2 = tulare_well_ID_year_part2.RP_READING.values
-                # pdb.set_trace()
-
-                combined = np.append(part1, part2)
-                average_rainy = np.empty(1)
-                average_rainy[:] = np.nan
-                if combined.size > 0:
-                    average_rainy = np.mean(combined)
-                seasonal_average[well_iter, season_iter] = average_rainy
-
-                # Dry season 
-                tulare_well_ID_year_dry  = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'].dt.year == year, :]
-                tulare_well_ID_year_dry  = tulare_well_ID_year_dry.loc[tulare_well_ID_year_dry['MEASUREMENT_DATE'].dt.month > 4, :]  # locate data betwwen october and May year + 1
-                tulare_well_ID_year_dry  = tulare_well_ID_year_dry.loc[tulare_well_ID_year_dry['MEASUREMENT_DATE'].dt.month < 10, :]  # locate data betwwen october and May year + 1
-
-                dry_season_values = tulare_well_ID_year_dry.RP_READING.values 
-
-                if dry_season_values.size > 0:
-                    seasonal_average[well_iter, season_iter + 1] = np.mean(tulare_well_ID_year_dry.RP_READING)
-
-                season_iter = season_iter + 2
-
-            well_iter = well_iter + 1  
-        else:
-            well_iter = well_iter + 1 
-
-        # pdb.set_trace()
         skip_id = 0 
         skip_id2 = 0
 
@@ -444,7 +458,7 @@ def seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tula
             # plt.legend()
 
         # if import_seasonal_averages ==1:
-        def import_seasonal_average(r):
+        def plot_seasonal_average(r):
 
             # x_values = np.arange(1939.5,2018.5, 0.5)                          # What is a better way? - Pandas resample
             x_values = pd.date_range(start='Sep-1939', end=' Sep-2018', freq='6M')
@@ -569,17 +583,15 @@ def seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tula
 
             return r
         if compiling_seasonal_averages == 0: # function runs if seasonal averages have already been compiled 
-            r = import_seasonal_average(r)
-            seasonal_average = 'Test- seasonal_average is already saved in the csv file'
+            r = plot_seasonal_average(r)
+            seasonal_average_test = 'Test- seasonal_average is already saved in the csv file'
     # Save seasonal_averages to a .csv file
 
-    return seasonal_average, well_iter, tulare_wells13, tulare_wells16
+    return seasonal_average_test, well_iter, tulare_wells13, tulare_wells16
 
-seasonal_average, well_iter, tulare_wells13, tulare_wells16 = seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tulare_wells16, v, r)
-if compiling_seasonal_averages == 1:
-    # csv.writer()
-    np.savetxt("seasonal_averages.csv", seasonal_average, delimiter=",")
-    np.savetxt("seasonal_averages_corresponding_IDs.csv", tulare_county_IDs_all, delimiter=",")
+well_iter = 0 
+seasonal_average_test, well_iter, tulare_wells13, tulare_wells16 = seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tulare_wells16, v, r)
+
 
 s1 = tulare_wells16.SITE_CODE  
 s2 = tulare_wells13.SITE_CODE
@@ -618,7 +630,7 @@ def gw_map_changes():
                 urcrnrlat=43.2, projection='cyl', resolution='i', area_thresh=25000.0)
 
     m.drawmapboundary(fill_color='steelblue', zorder=-99)
-    m.arcgisimage(service='ESRI_StreetMap_World_2D', xpixels = 5000, dpi=500, verbose= True)
+    m.arcgisimage(service='ESRI_StreetMap_World_2D', xpixels = 5000, dpi=300, verbose= True)
     m.drawstates(zorder=6, color='gray')
     m.drawcountries(zorder=6, color='gray')
     m.drawcoastlines(color='gray')
@@ -628,12 +640,12 @@ def gw_map_changes():
     m.scatter(x,y,s=30,c=water_drawdown_changes, marker='o', edgecolor='None', cmap=variable_object)
     plt.colorbar()
 
-    # plt.savefig('map.svg')
     plt.show()
-    # pdb.set_trace()
+
 gw_map_changes()
-print('paused here after making the first graph ')
+print('paused here after making the first graph')
 pdb.set_trace()
+
 
 groundwater_map2 = 0  # Groundwater plotting of changes in water level from year prior -  for a certain year - set-up for only years with historical data
 # currently using change_year_before file 
@@ -694,10 +706,9 @@ if groundwater_map3 ==1:
 
     plt.show()
 
-groundwater_map7 = 1 # - attempt2  set colorbar scale plots the average for the 5 years leading up, and the previous 5
-if groundwater_map7 ==1:
-    RP_difference, lats, lons, range_string, county_id5 = average_depth_5year_comparison(2015)
 
+def plot_map(RP_difference, lats, lons, range_string, plot_title): 
+    print('Plotting')
     print(range_string)
     print('pause here')
     pdb.set_trace()
@@ -707,7 +718,7 @@ if groundwater_map7 ==1:
                 urcrnrlat=43.2, projection='cyl', resolution='f', area_thresh=25000.0)  # change resolution to 'high' l
 
     m.drawmapboundary(fill_color='steelblue', zorder=-99)
-    m.arcgisimage(service='ESRI_StreetMap_World_2D', xpixels = 1000, dpi=500, verbose= True)
+    m.arcgisimage(service='ESRI_StreetMap_World_2D', xpixels = 1000, dpi=300, verbose= True)
     m.drawstates(zorder=6, color='gray')
     m.drawcountries(zorder=6, color='gray')
     m.drawcoastlines(color='gray')
@@ -716,11 +727,18 @@ if groundwater_map7 ==1:
     variable_object = plt.cm.get_cmap('bwr')
     m.scatter(x,y,s=30,c=RP_difference, marker='o', edgecolor='None', cmap=variable_object)
     plt.colorbar()
-    plt.title('2010 - 2015 Groundwater Level Average Compared with 2005 - 2010')
+
+    plt.title(plot_title)
+    # plt.title('2010 - 2015 Groundwater Level Average Compared with 2005 - 2010')
     plt.clim(-100,65)
     plt.savefig("comparison_GW.png", dpi = 300)
     plt.show()
     pdb.set_trace()
+
+groundwater_map7 = 1 # - attempt2  set colorbar scale plots the average for the 5 years leading up, and the previous 5
+if groundwater_map7 ==1:
+    RP_difference, lats, lons, range_string, county_id5, plot_title = average_depth_5year_comparison(2015)  # crunch numbers 
+    plot_map(RP_difference, lats, lons, range_string, plot_title)   # plot it 
 
 
 attempt_all_irrigation = 1  #plots all months of irrigation averages by season 

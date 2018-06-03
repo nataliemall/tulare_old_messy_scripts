@@ -256,6 +256,7 @@ def plot_wheat():
 #extract calPIP data from file:
 crop_time_series, overall_data, highest_acres_calPIP = extract_calPIP_data()
 
+pdb.set_trace()
 #extract commissioner data 
 df, highest_valued, highest_acres = extract_commissioner_data()
 print(highest_valued.crop)

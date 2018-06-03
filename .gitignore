@@ -1,6 +1,5 @@
 *.csv 
 test_ignore.md
+.DS_Store
 *.txt
-*.xlsx
-.DS_Store
-.DS_Store
+*.png 

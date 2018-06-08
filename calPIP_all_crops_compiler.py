@@ -19,13 +19,13 @@ def read_data(year):  # read calPIP downloaded data file for given year
     calPIP_data = pd.read_csv(file_name, sep = '\t')   #Pulls data from CSV file for the year
 
     crop_list = calPIP_data.SITE_NAME.unique()
+    pdb.set_trace()
+    return crop_list, calPIP_data
+
+
+def clean_columns(crop_list):  # remove slashes and spaces, cut to 20 characters and place 'acres' in column name
+    # pdb.set_trace()
     column_list = []
-    # pdb.set_trace()
-    return crop_list, column_list, calPIP_data
-
-
-def clean_columns(column_list, crop_list):  # remove slashes and spaces, cut to 20 characters and place 'acres' in column name
-    # pdb.set_trace()
     for crop_type in tqdm(crop_list): 
         if type(crop_type) == float:
             crop_cleaned = str(crop_type)
@@ -106,8 +106,10 @@ def acreage_compiler(year, crop_type, crop_iter, column_list, calPIP_data):  # c
                 except: 
                     total_at_site_loc = 0 
                     print(f'No value for amount planted at COMTRS {COMTRS_value} at parcel {individual_site}')
-                if pd.isnull(individual_site) == True or individual_site == np.nan:   # If site_ID is not labelled
-                    total_at_site_loc = sum(specific_parcel.AMOUNT_PLANTED.unique()) # sum up all unique area values
+
+                # commented these back in
+                # if pd.isnull(individual_site) == True or individual_site == np.nan:   # If site_ID is not labelled
+                #     total_at_site_loc = sum(specific_parcel.AMOUNT_PLANTED.unique()) # sum up all unique area values
                 acreages_for_each_site_loc[parcel_iter] = total_at_site_loc
                 total_in_COMTRS = sum(acreages_for_each_site_loc)
                     # pdb.set_trace()
@@ -153,11 +155,11 @@ def save_overall_dataframe(crop4_df, directory, year):
 def calPIP_summed(year): 
     """enter year for desired data compilation, run for that year"""
 
-    crop_list, column_list, calPIP_data = read_data(year)  # read calPIP data for given year 
-    column_list = clean_columns(column_list, crop_list)         # clean column names - remove slashes and spaces 
+    crop_list, calPIP_data = read_data(year)  # read calPIP data for given year 
+    column_list = clean_columns(crop_list)         # clean column names - remove slashes and spaces 
     crop4_df, tulare_overall_by_crop = make_dataframe(year, calPIP_data, column_list, crop_list)    # make dataframe for the crop acreage summations     
     
-    pdb.set_trace()
+    # pdb.set_trace()
 
     crop_iter = 0 
     for crop_type in tqdm(crop_list):  # Runs for each crop type in calPIP database, then connects to larger calPIP array using COMTRS index 
@@ -199,8 +201,8 @@ def run_specific_year(year):
 
 results_single_year = run_specific_year(1990)
 
-pdb.set_trace()
-results_all_years = run_full_year_range()
+# pdb.set_trace()
+# results_all_years = run_full_year_range()
 
 
 

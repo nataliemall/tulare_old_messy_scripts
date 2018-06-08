@@ -1,5 +1,8 @@
+*.png
 *.csv 
+*.npy
 test_ignore.md
-.DS_Store
 *.txt
-*.png 
+*.xlsx
+.DS_Store
+.DS_Store

@@ -51,6 +51,7 @@ def make_dataframe(year, calPIP_data, column_list, crop_list): # Build empty dat
 
 
 def acreage_compiler(year, crop_type, crop_iter, column_list, calPIP_data):  # compiles acreage for each COMTRS location and stores the data 
+    total_skipped = 0 
     # calPIP_data
     crop_type_vals = calPIP_data.loc[lambda df: calPIP_data.SITE_NAME == crop_type, : ]  # pulls permits for each of the crop types (filters for only this crop)
     no_location_IDs = len(crop_type_vals.SITE_LOCATION_ID.unique()) # number of unique parcel IDs for specific crop 
@@ -120,6 +121,7 @@ def acreage_compiler(year, crop_type, crop_iter, column_list, calPIP_data):  # c
         else:
             COMTRS_county = 'unknown due to no matching COMTRS'
             print('skipped due to no matching COMTRS')
+            total_skipped = total_skipped + 1 
             total_in_COMTRS = 0 
         # pdb.set_trace()
         if COMTRS_county == 'TULARE' and total_in_COMTRS > 0:

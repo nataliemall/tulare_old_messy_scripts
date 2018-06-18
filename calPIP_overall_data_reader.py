@@ -477,6 +477,7 @@ def group_by_crop_type_all_year():   # Run this function if you want to recalcul
     tree_acreage_summed_for_year = np.zeros(len(range(1990,2017)))
     annual_acreage_summed_for_year = np.zeros(len(range(1990,2017)))
     forage_acreage_summed_for_year = np.zeros(len(range(1990,2017)))
+    percent_tree_acreage_summed_for_year = np.zeros(len(range(1990,2017)))
 
     for year_iter, year in enumerate(tqdm(range(1990,2017))):
         total_tree_acreage, total_annual_acreage, total_forage_acreage, year_all_crops_compiled = group_by_crop_type(year) 
@@ -485,6 +486,8 @@ def group_by_crop_type_all_year():   # Run this function if you want to recalcul
         tree_acreage_summed_for_year[year_iter] = total_tree_acreage
         annual_acreage_summed_for_year[year_iter] = total_annual_acreage
         forage_acreage_summed_for_year[year_iter] = total_forage_acreage
+        percent_tree_acreage_summed_for_year[year_iter] = total_tree_acreage / (total_tree_acreage + total_annual_acreage + total_forage_acreage) 
+
         # pdb.set_trace()
 
     # Save
@@ -492,15 +495,19 @@ def group_by_crop_type_all_year():   # Run this function if you want to recalcul
     np.savetxt('tree_acreage_summed_for_year.csv', tree_acreage_summed_for_year)
     np.savetxt('annual_acreage_summed_for_year.csv', annual_acreage_summed_for_year)
     np.savetxt('forage_acreage_summed_for_year.csv', forage_acreage_summed_for_year)
+    np.savetxt('percent_tree_acreage_summed_for_year.csv', percent_tree_acreage_summed_for_year)
+
     # Load
-    return all, total_tree_acreage_dict, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year
+    return all, total_tree_acreage_dict, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year, percent_tree_acreage_summed_for_year
 
 def load_crop_type_all_year():  # loads the data already calculated rather than recalculate it all 
     all = np.load('all_crops_compiled_with_crop_types.npy').item()
     tree_acreage_summed_for_year = np.loadtxt('tree_acreage_summed_for_year.csv')
     annual_acreage_summed_for_year = np.loadtxt('annual_acreage_summed_for_year.csv')
     forage_acreage_summed_for_year = np.loadtxt('forage_acreage_summed_for_year.csv')
-    return all, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year
+    percent_tree_acreage_summed_for_year = np.loadtxt('percent_tree_acreage_summed_for_year.csv')
+
+    return all, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year, percent_tree_acreage_summed_for_year
     # print(read_dictionary['hello']) # displays "world"
 
 
@@ -523,8 +530,54 @@ def plot_crop_comparison(tree_acreage_summed_for_year,annual_acreage_summed_for_
     plt.show()
 
 
+def crop_value_calcs(df): 
+    # step 1: calculate average value of tree crops per acre  
+    highest_valued = df[df.index=='2016'].sort_values(by='value', ascending=False).head(50)
+    # nectarines = highest_valued[highest_valued.loc(highest_valued.crop == 'NECTARINES')]
+    tree_crop_list = ['ORANGES NAVEL', 'GRAPES TABLE', 'TANGERINES & MANDARINS', 'PISTACHIOS', 'ALMONDS ALL', 'ORANGES VALENCIA',
+                'WALNUTS ENGLISH', 'LEMONS ALL', 'NECTARINES', 'PLUMS','PEACHES FREESTONE','GRAPES RAISIN','GRAPES WINE',
+                'KIWIFRUIT','BERRIES BLUEBERRIES','OLIVES','PLUMS DRIED','CHERRIES SWEET','GRAPEFRUIT ALL', 'PEACHES CLINGSTONE',
+                'APRICOTS ALL', 'PERSIMMONS', 'POMEGRANATES', 'PECANS']
+    annual_crop_list = ['CORN SILAGE', 'SILAGE', 'HAY ALFALFA', 'PASTURE IRRIGATED', 'COTTON LINT UNSPECIFIED',
+             'VEGETABLES UNSPECIFIED', 'FIELD CROPS UNSPECIFIED', 'BEANS DRY EDIBLE UNSPECIFIED ', 'WHEAT ALL, HAY OTHER UNSPECIFIED']
+    total_crop_acreage = 0  # length of muber of years data is contained for (1984 - 2016)
+    total_weighted = 0
+    total_weighted_divided_by_total = np.zeros(33)
+    for num, year in tqdm(enumerate(range(1984,2017))):
+        total_crop_acreage = 0 
+        total_weighted = 0
+        for fruit in tqdm(tree_crop_list):
+            # pdb.set_trace()
+            tree_crop_revenue = df[df.crop == fruit].ppu *  ( df[df.crop == fruit]['yield'] )  # price/ acre 
+            try:
+                tree_crop_revenue_indiv_year = tree_crop_revenue[str(year)]  # tree crop revenue for the individual year
+                tree_crop_acreage = df[df.crop == fruit].acres 
+                tree_crop_acreage_indiv_year = tree_crop_acreage[str(year)]  # tree crop acreage for the individual year 
+            except: 
+                tree_crop_revenue_indiv_year = 0
+                tree_crop_acreage_indiv_year = 0 
+                print(f'no data for year {year} for crop {fruit}')
 
+            print(f'total {fruit} acreage in year {year}: {tree_crop_acreage_indiv_year}')
+            
+            total_crop_acreage = total_crop_acreage + tree_crop_acreage_indiv_year
+            # now, we have the total tree crop acreage as well as the acreage for each individual crop and the price of each individual crop 
+            # calculate weighted average of revenue/acre: 
+                # = ( sum for all crops: ( crop revenue x crop acreage )  ) / total_crop_acreage (tree crops)
+            weighted_individual_crop = tree_crop_revenue_indiv_year * tree_crop_acreage_indiv_year
+            total_weighted = total_weighted + weighted_individual_crop
 
+        print(f'total tree crop acreage in year {year}: {total_crop_acreage}')
+        total_weighted_divided_by_total[num] = total_weighted / total_crop_acreage  # gived the total weighted revenue of tree crops 
+        print(f'Weighted total tree crop revenue for year {year}: {total_weighted_divided_by_total[num]}')
+        pdb.set_trace()
+    # nectarines = highest_valued[highest_valued.crop == 'NECTARINES']
+    # nectarines_revenue = nectarines.ppu * nectarines.production  # total value (equivalent to nectarines.value)
+    # nectarines_revenue2 = nectarines.ppu * nectarines['yield']   ## price/acre = ppu * units/acre  = ppu * yield  
+    plt.plot(total_weighted_divided_by_total)
+    plt.show()
+
+    return tree_crop_revenue, nectarines_revenue2, total_crop_acreage, total_weighted_divided_by_total
 #extract calPIP data from file:
 crop_time_series, overall_data, highest_acres_calPIP = extract_calPIP_data()
 
@@ -540,19 +593,25 @@ if make_timeseries_plots == 1:
 overall_with_tree_crop_column, tree_list  = define_tree_crops(overall_data)
 
 calPIP_crop_types = pd.read_csv('/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages/overall_results_transposed.csv', sep = ',', index_col = 0)
+## ^^ not actually used 
 
-option = 1
-
+option = 2
 # Option 1: calculate all the data: 
 if option == 1:
-    all, total_tree_acreage_dict, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year = group_by_crop_type_all_year()
+    (all, total_tree_acreage_dict, tree_acreage_summed_for_year, annual_acreage_summed_for_year, 
+        forage_acreage_summed_for_year, percent_tree_acreage_summed_for_year) = group_by_crop_type_all_year()
 
 # Option 2: Load all the data to avoid re-calculating everything
 if option == 2: 
-    all, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year = load_crop_type_all_year()
+    (all, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year, 
+        percent_tree_acreage_summed_for_year) = load_crop_type_all_year()
 
 # Plot the comparisons of tree types 
 plot_crop_comparison(tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year )
+
+# plots just for Tulary County 
+tree_crop_revenue, nectarines_revenue2, total_crop_acreage, total_weighted_divided_by_total = crop_value_calcs(df)
+
 
 pdb.set_trace() 
 

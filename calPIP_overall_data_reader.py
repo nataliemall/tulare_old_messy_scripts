@@ -3,6 +3,7 @@
 import numpy as np 
 import matplotlib.colors as mplc
 import matplotlib.pyplot as plt
+import matplotlib.collections as collections
 import os 
 import pdb
 import pandas as pd
@@ -520,14 +521,24 @@ def load_crop_type_all_year():  # loads the data already calculated rather than 
 
 def plot_crop_comparison(tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year ): 
     year_list_array = np.arange(1990, 2017)
+    fig, ax = plt.subplots()
     #plotted using the numpy arrays: 
-    plt.plot(year_list_array[1:26], tree_acreage_summed_for_year[1:26], label = 'tree crop acreage')
-    plt.plot(year_list_array[1:26], annual_acreage_summed_for_year[1:26], label = 'annual crop acreage')
-    plt.plot(year_list_array[1:26], forage_acreage_summed_for_year[1:26], label = 'forage crop acreage')
+    ax.plot(year_list_array[1:26], tree_acreage_summed_for_year[1:26], label = 'tree crop acreage')
+    ax.plot(year_list_array[1:26], annual_acreage_summed_for_year[1:26], label = 'annual crop acreage')
+    ax.plot(year_list_array[1:26], forage_acreage_summed_for_year[1:26], label = 'forage crop acreage')
     plt.legend()
-    plt.title('Tulare County Crop Type Changes 1991 - 2016 ')
+    ax.set_title('Tulare County Crop Type Changes 1991 - 2016 with span_region ')
     plt.ylabel('Total acres planted')
+
+    logic_rule = ( (year_list_array > 2010) & (year_list_array < 2016)) # or (year_list_array > 1991 & year_list_array < 1995))  
+    collection = collections.BrokenBarHCollection.span_where(year_list_array, ymin=0, ymax=2500000, where=(logic_rule), facecolor='orange', alpha=0.3)
+    ax.add_collection(collection)
+    logic_rule2 =  ( (year_list_array < 1995) & (year_list_array > 1990)  )   
+    collection2 = collections.BrokenBarHCollection.span_where(year_list_array, ymin=0, ymax=2500000, where=(logic_rule2), facecolor='orange', alpha=0.3)
+    ax.add_collection(collection2)
+
     plt.show()
+    pdb.set_trace()
 
 
 def crop_value_calcs(df): 
@@ -539,13 +550,21 @@ def crop_value_calcs(df):
                 'KIWIFRUIT','BERRIES BLUEBERRIES','OLIVES','PLUMS DRIED','CHERRIES SWEET','GRAPEFRUIT ALL', 'PEACHES CLINGSTONE',
                 'APRICOTS ALL', 'PERSIMMONS', 'POMEGRANATES', 'PECANS']
     annual_crop_list = ['CORN SILAGE', 'SILAGE', 'HAY ALFALFA', 'PASTURE IRRIGATED', 'COTTON LINT UNSPECIFIED',
-             'VEGETABLES UNSPECIFIED', 'FIELD CROPS UNSPECIFIED', 'BEANS DRY EDIBLE UNSPECIFIED ', 'WHEAT ALL, HAY OTHER UNSPECIFIED']
-    total_crop_acreage = 0  # length of muber of years data is contained for (1984 - 2016)
-    total_weighted = 0
-    total_weighted_divided_by_total = np.zeros(33)
+             'VEGETABLES UNSPECIFIED', 'FIELD CROPS UNSPECIFIED', 'BEANS DRY EDIBLE UNSPECIFIED ', 'WHEAT ALL, HAY OTHER UNSPECIFIED',
+             'CORN GRAIN', 'HAY SUDAN', 'BROCCOLI PROCESSING', 'BARLEY FEED', 'BEANS DRY EDIBLE UNSPEC.', 'WHEAT SEED', 'BARLEY UNSPECIFIED',
+             'TOMATOES FRESH MARKET']
+    # total_tree_crop_acreage = 0  # length of muber of years data is contained for (1984 - 2016)
+    # total_weighted = 0
+    tree_crop_revenue_per_acre = np.zeros(33) # length of muber of years data is contained for (1984 - 2016)
+    annual_crop_revenue_per_acre = np.zeros(33) # length of muber of years data is contained for (1984 - 2016)
+    year_list_array = np.zeros(33) # length of muber of years data is contained for (1984 - 2016)
+    total_annual_crop_acreage = 0
+
     for num, year in tqdm(enumerate(range(1984,2017))):
-        total_crop_acreage = 0 
-        total_weighted = 0
+        total_tree_crop_acreage = 0 
+        total_annual_crop_acreage = 0 
+        total_weighted_tree = 0
+        total_weighted_annual = 0 
         for fruit in tqdm(tree_crop_list):
             # pdb.set_trace()
             tree_crop_revenue = df[df.crop == fruit].ppu *  ( df[df.crop == fruit]['yield'] )  # price/ acre 
@@ -559,25 +578,91 @@ def crop_value_calcs(df):
                 print(f'no data for year {year} for crop {fruit}')
 
             print(f'total {fruit} acreage in year {year}: {tree_crop_acreage_indiv_year}')
+            total_tree_crop_acreage = total_tree_crop_acreage + tree_crop_acreage_indiv_year
+            weighted_individual_crop = tree_crop_revenue_indiv_year * tree_crop_acreage_indiv_year
+            total_weighted_tree = total_weighted_tree + weighted_individual_crop
+
+        print(f'total tree crop acreage in year {year}: {total_tree_crop_acreage}')
+        tree_crop_revenue_per_acre[num] = total_weighted_tree / total_tree_crop_acreage  # gived the total weighted revenue of tree crops 
+        print(f'Weighted total tree crop revenue for year {year}: {tree_crop_revenue_per_acre[num]}')
+
+        for fruit in tqdm(annual_crop_list):
+            # pdb.set_trace()
+            annual_crop_revenue = df[df.crop == fruit].ppu *  ( df[df.crop == fruit]['yield'] )  # price/ acre 
+            try:
+                annual_crop_revenue_indiv_year = annual_crop_revenue[str(year)]  # tree crop revenue for the individual year
+                annual_crop_acreage = df[df.crop == fruit].acres 
+                annual_crop_acreage_indiv_year = annual_crop_acreage[str(year)]  # tree crop acreage for the individual year 
+            except: 
+                annual_crop_revenue_indiv_year = 0
+                annual_crop_acreage_indiv_year = 0 
+                print(f'no data for year {year} for crop {fruit}')
+
+            print(f'total {fruit} acreage in year {year}: {annual_crop_acreage_indiv_year}')
+            total_annual_crop_acreage = total_annual_crop_acreage + annual_crop_acreage_indiv_year
             
-            total_crop_acreage = total_crop_acreage + tree_crop_acreage_indiv_year
             # now, we have the total tree crop acreage as well as the acreage for each individual crop and the price of each individual crop 
             # calculate weighted average of revenue/acre: 
-                # = ( sum for all crops: ( crop revenue x crop acreage )  ) / total_crop_acreage (tree crops)
-            weighted_individual_crop = tree_crop_revenue_indiv_year * tree_crop_acreage_indiv_year
-            total_weighted = total_weighted + weighted_individual_crop
+                # = ( sum for all crops: ( crop revenue x crop acreage )  ) / total_tree_crop_acreage (tree crops)
+            weighted_individual_crop_annual = annual_crop_revenue_indiv_year * annual_crop_acreage_indiv_year
+            total_weighted_annual = total_weighted_annual + weighted_individual_crop_annual
 
-        print(f'total tree crop acreage in year {year}: {total_crop_acreage}')
-        total_weighted_divided_by_total[num] = total_weighted / total_crop_acreage  # gived the total weighted revenue of tree crops 
-        print(f'Weighted total tree crop revenue for year {year}: {total_weighted_divided_by_total[num]}')
-        pdb.set_trace()
-    # nectarines = highest_valued[highest_valued.crop == 'NECTARINES']
-    # nectarines_revenue = nectarines.ppu * nectarines.production  # total value (equivalent to nectarines.value)
-    # nectarines_revenue2 = nectarines.ppu * nectarines['yield']   ## price/acre = ppu * units/acre  = ppu * yield  
-    plt.plot(total_weighted_divided_by_total)
+        print(f'total annual crop acreage in year {year}: {total_annual_crop_acreage}')
+        annual_crop_revenue_per_acre[num] = total_weighted_annual / total_annual_crop_acreage  # gived the total weighted revenue of tree crops 
+        print(f'Weighted total annual crop revenue for year {year}: {annual_crop_revenue_per_acre[num]}')
+
+        year_list_array[num] = year
+    price_difference = tree_crop_revenue_per_acre - annual_crop_revenue_per_acre
+    pdb.set_trace()
+
+    fig, ax = plt.subplots()
+    ax.plot(year_list_array, tree_crop_revenue_per_acre, label = 'tree crop revenue per acre')
+    ax.plot(year_list_array, annual_crop_revenue_per_acre, label = 'annual crop revenue per acre')
+    ax.plot(year_list_array, price_difference, label = 'price difference')
+
+
+    logic_rule = ( (year_list_array > 2010) & (year_list_array < 2016)) # or (year_list_array > 1991 & year_list_array < 1995))  
+    collection = collections.BrokenBarHCollection.span_where(year_list_array, ymin=0, ymax=2500000, where=(logic_rule), facecolor='orange', alpha=0.3)
+    ax.add_collection(collection)
+    logic_rule2 =  ( (year_list_array < 1990) & (year_list_array > 1985)  )   
+    collection2 = collections.BrokenBarHCollection.span_where(year_list_array, ymin=0, ymax=2500000, where=(logic_rule2), facecolor='orange', alpha=0.3)
+    ax.add_collection(collection2)
+
+
+    # collection = collections.BrokenBarHCollection.span_where(year_array, ymin=0, ymax=10000, where=year_array > 1994, facecolor='green', alpha=0.5)
+    # ax.add_collection(collection)
+    plt.legend()
     plt.show()
 
-    return tree_crop_revenue, nectarines_revenue2, total_crop_acreage, total_weighted_divided_by_total
+    return tree_crop_revenue, total_tree_crop_acreage, tree_crop_revenue_per_acre, price_difference
+
+def plot_overall(tree_acreage_summed_for_year,annual_acreage_summed_for_year, price_difference ): 
+    year_list_array = np.arange(1990, 2017)
+    #plotted using the numpy arrays: 
+    fig, (ax0, ax1) = plt.subplots(nrows=2, sharex=True)
+    # plt.subplots(nrows = 2, sharex = True )
+    ax0.plot(year_list_array[1:26], tree_acreage_summed_for_year[1:26], label = 'tree crop acreage')
+    ax0.plot(year_list_array[1:26], annual_acreage_summed_for_year[1:26], label = 'annual crop acreage')
+    plt.legend()
+    ax0.set_title('total acres planted')
+    # plt.ylabel('Total acres planted')
+
+    # plt.subplots(2,2)
+    ax1.plot(year_list_array[1:26], price_difference[7:32], label = 'difference in revenue per acre')
+    plt.legend()
+    ax1.plot('Tulare County Crop Type Changes 1991 - 2016 ')
+    # plt.ylabel('Price difference')
+    plt.show()
+    pdb.set_trace()
+
+def plot_revenue_v_percent_tree(percent_tree_acreage_summed_for_year, price_difference):
+    x = price_difference[7:32]
+    y = percent_tree_acreage_summed_for_year[1:26]
+    plt.scatter(x,y)
+    plt.xlabel('price difference between tree and annual crops')
+    plt.ylabel('percent tree acreage in Tulare County')
+    plt.show()
+
 #extract calPIP data from file:
 crop_time_series, overall_data, highest_acres_calPIP = extract_calPIP_data()
 
@@ -609,9 +694,13 @@ if option == 2:
 # Plot the comparisons of tree types 
 plot_crop_comparison(tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year )
 
+pdb.set_trace()
 # plots just for Tulary County 
-tree_crop_revenue, nectarines_revenue2, total_crop_acreage, total_weighted_divided_by_total = crop_value_calcs(df)
+tree_crop_revenue, total_tree_crop_acreage, tree_crop_revenue_per_acre, price_difference = crop_value_calcs(df)
 
+plot_overall(tree_acreage_summed_for_year,annual_acreage_summed_for_year, price_difference )
+
+plot_revenue_v_percent_tree(percent_tree_acreage_summed_for_year, price_difference)
 
 pdb.set_trace() 
 

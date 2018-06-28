@@ -10,6 +10,7 @@ import numpy as np
 import math 
 import matplotlib.colors as mplc
 import matplotlib.pyplot as plt
+
 import pdb
 import pandas as pd
 import seaborn as sns
@@ -37,6 +38,9 @@ def get_CASGEM_data(counties, include_elevation_changes):
 
     # tulare_county_headers2 = county_headers.loc[lambda df: df.CASGEM_STATION_USE_DESC == 'Irrigation', :]  # Prints x? rows 
     county_IDs_all = county_headers.index.tolist()        # all IDs in Tulare County 
+
+    tlb_county_IDs_lat_lon = county_headers[['LATITUDE', 'LONGITUDE']]  # save this to a csv for arcGIS use 
+    # tlb_county_IDs_lat_lon.to_csv('tlb_county_IDs_lat_lon.csv')
     pdb.set_trace()
 
     
@@ -195,6 +199,9 @@ def average_depth_year_comparison(year_evaluating):   #compares a given year wit
         lons[well_iter] = lon_test.LONGITUDE.values
 
         RP_difference[well_iter] = RP_average - RP_average_prior  # If the water is depleting, this number should be increasing 
+        ## Bigger numbers are bad
+        ## RP = depth to groundwater 
+        ## if the new RP value is smaller, the water level rose and the RP_difference value is negative 
         if RP_difference[well_iter] < -600:
             RP_difference[well_iter] = np.nan
         np.mean(water_year_evaluating.RP_READING)

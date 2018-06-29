@@ -144,7 +144,7 @@ def compare_historical_with_2012(well_data_tulare_only):
     missing_1980 = 0 # sanity check 
     elevation_column = ['CASGEM_STATION_ID', 'ave_80_85']
     water_level_ave_80_85 = pd.DataFrame(columns = elevation_column) # create dataframe column for the waterlevel change
-    array_80_85 = np.zeros(1000)
+    array_80_85 = np.zeros(1000)  # To be filled in function "seasonal_and_other_comparisons"
     array_80_85_wellIDs = np.zeros(1000, dtype=np.int32)
 
     return starting_datetime, tulare_wells11, tulare_wells_1980, tulare_wells_1980_1985, tulare_wells13, tulare_wells16, missing_1980, water_level_ave_80_85, array_80_85, array_80_85_wellIDs 
@@ -286,6 +286,80 @@ def average_depth_5year_comparison(year_evaluating):  # Compares 5 years (averag
 
     return RP_difference, lats, lons, year_range_string, county_id5, plot_title 
 
+
+def drawdown_any_years_comparison(base_year, year_evaluating):  # Compares 5 years (averaged) with the average of the 5 years prior
+    '''Compares base year and 5 years prior with the chosen evaluating year and 5 years prior'''
+    ''' Current depth - Base years depth = drawdown => Large drawdown rates means wells are currently much deeper '''
+
+    base_start =  str(base_year - 5) + '-10-01 00:00:00'
+    base_end =  str(base_year) + '-09-30 00:00:00'
+
+    water_year_start = str(year_evaluating -5) + '-10-01 00:00:00'  # start of water year: Oct 1 of previos year 
+    water_year_end = str(year_evaluating) + '-09-30 00:00:00'
+
+    starting = str(pd.to_datetime(base_start).year)
+    ending = str(pd.to_datetime(water_year_end).year)
+    print('experiment with plot_title here')
+    pdb.set_trace()
+    plot_title = str(str(base_year -5) + '-' + str(base_year) + ' Groundwater Level Average Compared with ' + str(year_evaluating - 5) + '-' + str(year_evaluating))
+    
+    year_range_string = ('Water level difference in October',starting,'through September', ending)
+    lats = np.empty(len(county_IDs_all))
+    lats[:] = np.nan
+    lons = np.empty(len(county_IDs_all))
+    lons[:] = np.nan
+    RP_difference = np.empty(len(county_IDs_all))
+    RP_difference[:] = np.nan
+    county_id_array = np.empty(len(county_IDs_all))
+    county_id_array[:] = np.nan
+
+    # well_iter = 0 
+    for well_iter, county_id in enumerate(tqdm(county_IDs_all)): 
+        tulare_wells90 = well_data_tulare_only.loc[well_data_tulare_only['CASGEM_STATION_ID'] == county_id, :] #filters by well
+        water_year_evaluating  = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'] >= water_year_start, :] #filters by year 
+        water_year_evaluating = water_year_evaluating.loc[water_year_evaluating['MEASUREMENT_DATE'] <= water_year_end , :]
+
+
+        water_year_prior  = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'] >= base_start, :]
+        water_year_prior = water_year_prior.loc[water_year_prior['MEASUREMENT_DATE'] <= base_end , :]
+
+        # starting_datetime = '2012-07-01 00:00:00'
+
+        # test3 = well_data_tulare_only.resample(well_data_tulare_only.RP_READING,'6M', on='MEASUREMENT_DATE')
+        # (start='Sep-1939', end=' Sep-2018', freq='6M')
+        # pd.resample(well_data_tulare_only.RP_READING,'6M')
+
+        RP_average_recent = water_year_evaluating.RP_READING.mean()
+        RP_average_base_year = water_year_prior.RP_READING.mean()
+
+        # get lat & long of this county ID 
+        lat_test = county_headers.loc[county_headers.index == county_id,:] 
+        lats[well_iter] = lat_test.LATITUDE.values
+
+        lon_test = county_headers.loc[county_headers.index == county_id,:] 
+        lons[well_iter] = lon_test.LONGITUDE.values
+        county_id_array[well_iter] = county_id
+
+        RP_difference[well_iter] = RP_average_recent - RP_average_base_year  # If the water is depleting, this number should be increasing 
+        if RP_difference[well_iter] > 150:  # takes out outliers
+            RP_difference[well_iter] = np.nan
+        # np.mean(water_year_evaluating.RP_READING)
+        # well_iter = well_iter + 1
+        # pdb.set_trace()
+
+    gw_array = np.vstack((county_id_array, lats, lons, RP_difference))
+    gw_array = np.transpose(gw_array)
+    gw_df = pd.DataFrame(gw_array)
+    gw_df.columns = ['county_ID', 'latitudes', 'longitudes', 'RP_difference']
+    gw_df.set_index('county_ID')  # fix id value 
+    pdb.set_trace()
+    print('line 356')
+    gw_df.to_csv(   str('GW_change_comparison' + str(base_year) +'with' + str(year_evaluating) + '.csv'))
+    # pdb.set_trace()
+
+    return RP_difference, lats, lons, year_range_string, county_id_array, plot_title 
+
+
 # Function that compiles the seasonal average right here 
 def compile_seasonal_averages():
     print('Compiling seasonal averages- please wait')
@@ -363,7 +437,7 @@ def seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tula
         tulare_wells80 = tulare_wells_1980_1985.loc[tulare_wells_1980_1985['CASGEM_STATION_ID'] == county_id, :]
         tulare_wells81 = tulare_wells80.RP_READING.mean()  # takes only first measurement in the time period 
 
-        if tulare_wells80.empty:               # does this mean all the values are empty? 
+        if tulare_wells80.empty:               # All values are empty (no data points between 80-85 for this ID)
             missing_1980 = missing_1980 + 1
             skip_id2 = 1  
 
@@ -605,6 +679,13 @@ def water_drawdown_changes_1980_85():
     tulare_wells18['RP_change'] = tulare_wells18.RP_READING - tulare_wells18.ave_80_85  # smaller RP means water closer to surface
 
     water_drawdown_changes = tulare_wells18.RP_change.values
+    # pdb.set_trace()
+    # water_drawdown_ids = tulare_wells18.CASGEM_STATION_ID.values
+    # well_ids_with_drawdown = pd.DataFrame(water_drawdown_changes, water_drawdown_ids)
+    df_well_ids_with_drawdown = tulare_wells18.ix[:,['CASGEM_STATION_ID','RP_change']]
+
+    ## Create pandas dataframe 
+
     if include_elevation_changes ==1:
         change_year_before = tulare_wells18.change_from_year_prior.values # FIX THIS - Should use tulare_wells2 or tulare_wells_oct # depends on date entered for recent timeframe - tulare_wells10  - originally tulare_wells18
     else:
@@ -613,7 +694,7 @@ def water_drawdown_changes_1980_85():
 
     lats = tulare_wells18.LATITUDE.values
     lons = tulare_wells18.LONGITUDE.values
-    return water_drawdown_changes, change_year_before, lats, lons 
+    return df_well_ids_with_drawdown, water_drawdown_changes, change_year_before, lats, lons 
 
 
 def gw_map_changes(water_drawdown_changes):  
@@ -699,7 +780,7 @@ def create_csv_for_arcgis(filename, county_id5, lats, lons, RP_difference):
 ####################### Start of tree frame ##############################
 # counties = 'Tulare'
 counties = 'All'   ############# not yet complete: this doesn't actually implement since it first tries to use the cvs file already stored 
-include_elevation_changes = 1 # include elevation compared to year before - will calculate these the file does not exist 
+include_elevation_changes = 1 # include elevation compared to year before - will calculate these IF the file does not exist 
 compiling_seasonal_averages = 0 # takes the data and compiles average RP_READING for each season (set equal to 1 if this hasn't already been done)
 
 well_data_tulare_only, county_headers, county_IDs_all = get_CASGEM_data(counties, include_elevation_changes)
@@ -734,10 +815,20 @@ pdb.set_trace()
 well_iter = 0 
 seasonal_average_test, well_iter, tulare_wells13, tulare_wells16 = seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tulare_wells16, v, r, Y_irrigation, include_elevation_changes)
 
-water_drawdown_changes, change_year_before, lats, lons = water_drawdown_changes_1980_85()
+df_well_ids_with_drawdown, water_drawdown_changes, change_year_before, lats, lons = water_drawdown_changes_1980_85()
+df_well_ids_with_drawdown.to_csv('df_well_ids_with_drawdown.csv', na_rep = "nan" , index = False  )
 
-print('Test manually from here')
 pdb.set_trace()
+
+testing_june29 = 1
+if testing_june29 ==1: 
+    base_year = 1995
+    year_evaluating = 2010 
+    RP_difference, lats, lons, year_range_string, county_id_array, plot_title = drawdown_any_years_comparison(base_year, year_evaluating)
+    print('pause year and test out stuff')
+    pdb.set_trace()
+    print('Test manually from here')
+
 
 gw_map_changes(water_drawdown_changes)   # gives a figure that seems interpolatable 
 print('paused here after making the first graph')

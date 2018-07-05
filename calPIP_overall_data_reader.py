@@ -663,6 +663,72 @@ def plot_revenue_v_percent_tree(percent_tree_acreage_summed_for_year, price_diff
     plt.ylabel('percent tree acreage in Tulare County')
     plt.show()
 
+
+def orchard_crop_year_comparison(base_year, comparison_year, years_width):
+    # pdb.set_trace()
+    orchard_acreage_by_year_base = {}
+    orchard_acreage_by_year_comp = {}
+
+    for year in range(years_width):
+
+        year_analysing = base_year + year
+        # pdb.set_trace()
+        base_year_percentages = pd.read_csv(os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages', (str(year_analysing) + 'files' ), (str(year_analysing) + '_complete_acreage_breakdown.csv')  )) 
+        base_year_percentages = base_year_percentages.rename(columns={"level_0": "COMTRS"})
+        tree_crop_string =  "tree_crop_acreage_year" + str(year_analysing)
+        base_year_percentages = base_year_percentages.rename(columns={"tree_crop_acreage": str(tree_crop_string)})  
+        # base_year_percentages = base_year_percentages.set_index('COMTRS')
+        base_year_data = base_year_percentages.ix[:, ['COMTRS',str(tree_crop_string)]]  # saves only the county ID and comtrs column 
+        orchard_acreage_by_year_base[year_analysing] = base_year_data
+
+        if year_analysing == base_year:
+            base_years_orchard = orchard_acreage_by_year_base[base_year] # base year 
+        else: 
+            base_years_orchard = pd.merge(base_years_orchard, orchard_acreage_by_year_base[year_analysing]) # merges following years together 
+            # pdb.set_trace()
+        # pdb.set_trace()
+
+
+        comparison_year_analysing = comparison_year + year
+        comp_year_percentages = pd.read_csv(os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages', (str(comparison_year_analysing) + 'files' ), (str(comparison_year_analysing) + '_complete_acreage_breakdown.csv')  )) 
+        comp_year_percentages = comp_year_percentages.rename(columns={"level_0": "COMTRS"})
+        tree_crop_string =  "tree_crop_acreage_year" + str(comparison_year_analysing)
+        comp_year_percentages = comp_year_percentages.rename(columns={"tree_crop_acreage": str(tree_crop_string)})  
+   
+        comp_year_data = comp_year_percentages.ix[:, ['COMTRS',str(tree_crop_string)]]  # saves only the county ID and comtrs column 
+        orchard_acreage_by_year_comp[comparison_year_analysing] = comp_year_data
+
+        if comparison_year_analysing == comparison_year:
+            comp_years_orchard = orchard_acreage_by_year_comp[comparison_year] # base year 
+        else: 
+            comp_years_orchard = pd.merge(comp_years_orchard, orchard_acreage_by_year_comp[comparison_year_analysing]) # merges following years together 
+            # pdb.set_trace()
+        # pdb.set_trace()
+
+
+
+    # create a column where the 5 years are averaged 
+    base_years_orchard = base_years_orchard.set_index('COMTRS')
+    # base_years_orchard['average_orchard_acreage'] = np.mean(base_years_orchard.iloc[1,:])
+    base_years_orchard_with_ave = base_years_orchard.copy()
+    base_years_orchard_with_ave['average_orchard_acreage_base'] = base_years_orchard_with_ave.mean(numeric_only=True, axis=1)
+
+    comp_years_orchard = comp_years_orchard.set_index('COMTRS')
+    comp_years_orchard_with_ave = comp_years_orchard.copy()
+    comp_years_orchard_with_ave['average_orchard_acreage_comp'] = comp_years_orchard_with_ave.mean(numeric_only=True, axis=1)
+    pdb.set_trace()
+
+    base_mean = base_years_orchard_with_ave.ix[:, ['average_orchard_acreage_base']] 
+    base_mean = base_mean.reset_index()
+    comp_mean = comp_years_orchard_with_ave.ix[:, ['average_orchard_acreage_comp']] 
+    comp_mean = comp_mean.reset_index()
+    # well_ids_with_comtrs = iter_data.ix[:, ['county_ID','co_mtrs']] 
+    orchard_crop_acreage_difference = pd.merge(base_mean, comp_mean)
+    orchard_crop_acreage_difference['orchard_acreage_difference'] = orchard_crop_acreage_difference.average_orchard_acreage_comp - orchard_crop_acreage_difference.average_orchard_acreage_base
+    # ^ comparison - base  : shows growth in tree acreage. Large comparison year means positive expansion in tree acreage
+    return base_year_percentages , base_years_orchard_with_ave, comp_years_orchard_with_ave, orchard_crop_acreage_difference
+
+
 #extract calPIP data from file:
 crop_time_series, overall_data, highest_acres_calPIP = extract_calPIP_data()
 
@@ -680,30 +746,40 @@ overall_with_tree_crop_column, tree_list  = define_tree_crops(overall_data)
 calPIP_crop_types = pd.read_csv('/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages/overall_results_transposed.csv', sep = ',', index_col = 0)
 ## ^^ not actually used 
 
-option = 2
+crop_compiling_option = 2
 # Option 1: calculate all the data: 
-if option == 1:
+if crop_compiling_option == 1:
     (all, total_tree_acreage_dict, tree_acreage_summed_for_year, annual_acreage_summed_for_year, 
         forage_acreage_summed_for_year, percent_tree_acreage_summed_for_year) = group_by_crop_type_all_year()
 
 # Option 2: Load all the data to avoid re-calculating everything
-if option == 2: 
+if crop_compiling_option == 2: 
     (all, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year, 
         percent_tree_acreage_summed_for_year) = load_crop_type_all_year()
 
-# Plot the comparisons of tree types 
-plot_crop_comparison(tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year )
+plotting_overall_acreages = 0
+if plotting_overall_acreages ==1:
 
+    # Plot the comparisons of tree types 
+    plot_crop_comparison(tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year )
+
+    pdb.set_trace()
+    # plots just for Tulary County 
+    tree_crop_revenue, total_tree_crop_acreage, tree_crop_revenue_per_acre, price_difference = crop_value_calcs(df)
+
+    plot_overall(tree_acreage_summed_for_year,annual_acreage_summed_for_year, price_difference )
+
+    plot_revenue_v_percent_tree(percent_tree_acreage_summed_for_year, price_difference)
+
+    pdb.set_trace() 
+
+
+
+base_year = 1991 
+comparison_year = 2010
+years_width = 5 
+
+base_year_percentages, base_years_orchard_with_ave, comp_years_orchard_with_ave, orchard_crop_acreage_difference = orchard_crop_year_comparison(base_year, comparison_year, years_width)
 pdb.set_trace()
-# plots just for Tulary County 
-tree_crop_revenue, total_tree_crop_acreage, tree_crop_revenue_per_acre, price_difference = crop_value_calcs(df)
-
-plot_overall(tree_acreage_summed_for_year,annual_acreage_summed_for_year, price_difference )
-
-plot_revenue_v_percent_tree(percent_tree_acreage_summed_for_year, price_difference)
-
-pdb.set_trace() 
-
-
 
 

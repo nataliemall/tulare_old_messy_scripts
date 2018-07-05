@@ -242,8 +242,8 @@ def average_depth_5year_comparison(year_evaluating):  # Compares 5 years (averag
     county_id5 = np.empty(len(county_IDs_all))
     county_id5[:] = np.nan
 
-    well_iter = 0 
-    for county_id in tqdm(county_IDs_all): 
+    # well_iter = 0 
+    for well_iter, county_id in enumerate(tqdm(county_IDs_all)): 
         tulare_wells90 = well_data_tulare_only.loc[well_data_tulare_only['CASGEM_STATION_ID'] == county_id, :] #filters by well
         water_year_evaluating  = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'] >= water_year_start, :] #filters by year 
         water_year_evaluating = water_year_evaluating.loc[water_year_evaluating['MEASUREMENT_DATE'] <= water_year_end , :]
@@ -251,12 +251,6 @@ def average_depth_5year_comparison(year_evaluating):  # Compares 5 years (averag
 
         water_year_prior  = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'] >= year_prior_start, :]
         water_year_prior = water_year_prior.loc[water_year_prior['MEASUREMENT_DATE'] <= year_prior_end , :]
-
-        # starting_datetime = '2012-07-01 00:00:00'
-
-        # test3 = well_data_tulare_only.resample(well_data_tulare_only.RP_READING,'6M', on='MEASUREMENT_DATE')
-        # (start='Sep-1939', end=' Sep-2018', freq='6M')
-        # pd.resample(well_data_tulare_only.RP_READING,'6M')
 
         RP_average = water_year_evaluating.RP_READING.mean()
         RP_average_prior = water_year_prior.RP_READING.mean()
@@ -273,7 +267,7 @@ def average_depth_5year_comparison(year_evaluating):  # Compares 5 years (averag
         if RP_difference[well_iter] > 100:  # takes out outliers
             RP_difference[well_iter] = np.nan
         # np.mean(water_year_evaluating.RP_READING)
-        well_iter = well_iter + 1
+        # well_iter = well_iter + 1
         # pdb.set_trace()
 
     gw_array7 = np.vstack((county_id5, lats, lons, RP_difference))
@@ -313,7 +307,6 @@ def drawdown_any_years_comparison(base_year, year_evaluating):  # Compares 5 yea
     county_id_array = np.empty(len(county_IDs_all))
     county_id_array[:] = np.nan
 
-    # well_iter = 0 
     for well_iter, county_id in enumerate(tqdm(county_IDs_all)): 
         tulare_wells90 = well_data_tulare_only.loc[well_data_tulare_only['CASGEM_STATION_ID'] == county_id, :] #filters by well
         water_year_evaluating  = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'] >= water_year_start, :] #filters by year 
@@ -322,12 +315,6 @@ def drawdown_any_years_comparison(base_year, year_evaluating):  # Compares 5 yea
 
         water_year_prior  = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'] >= base_start, :]
         water_year_prior = water_year_prior.loc[water_year_prior['MEASUREMENT_DATE'] <= base_end , :]
-
-        # starting_datetime = '2012-07-01 00:00:00'
-
-        # test3 = well_data_tulare_only.resample(well_data_tulare_only.RP_READING,'6M', on='MEASUREMENT_DATE')
-        # (start='Sep-1939', end=' Sep-2018', freq='6M')
-        # pd.resample(well_data_tulare_only.RP_READING,'6M')
 
         RP_average_recent = water_year_evaluating.RP_READING.mean()
         RP_average_base_year = water_year_prior.RP_READING.mean()
@@ -343,9 +330,6 @@ def drawdown_any_years_comparison(base_year, year_evaluating):  # Compares 5 yea
         RP_difference[well_iter] = RP_average_recent - RP_average_base_year  # If the water is depleting, this number should be increasing 
         if RP_difference[well_iter] > 150:  # takes out outliers
             RP_difference[well_iter] = np.nan
-        # np.mean(water_year_evaluating.RP_READING)
-        # well_iter = well_iter + 1
-        # pdb.set_trace()
 
     gw_array = np.vstack((county_id_array, lats, lons, RP_difference))
     gw_array = np.transpose(gw_array)
@@ -359,7 +343,6 @@ def drawdown_any_years_comparison(base_year, year_evaluating):  # Compares 5 yea
 
     return RP_difference, lats, lons, year_range_string, county_id_array, plot_title 
 
-
 # Function that compiles the seasonal average right here 
 def compile_seasonal_averages():
     print('Compiling seasonal averages- please wait')
@@ -368,9 +351,9 @@ def compile_seasonal_averages():
     seasonal_average[:] = np.nan
     seasonal_average[0] = 0  
     year_range = np.arange(1940,2018)
-    well_iter = 0 
+    # well_iter = 0 
 
-    for county_id in tqdm(county_IDs_all):   # runs through data for all Tulare County IDs 
+    for well_iter, county_id in enumerate(tqdm(county_IDs_all)):   # runs through data for all Tulare County IDs 
         #Data for this specific well ID: 
         tulare_wells90 = well_data_tulare_only.loc[well_data_tulare_only['CASGEM_STATION_ID'] == county_id, :]
 
@@ -408,7 +391,7 @@ def compile_seasonal_averages():
 
             season_iter = season_iter + 2
 
-        well_iter = well_iter + 1  
+        # well_iter = well_iter + 1  
         # pdb.set_trace()
     
     np.savetxt("seasonal_averages.csv", seasonal_average, delimiter=",")
@@ -422,13 +405,13 @@ def import_seasonal_averages():
     return imported_seasonal_averages 
 
 # Iterates through each of the well IDs in Tulare County 
-def seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tulare_wells16, v, r, Y_irrigation, include_elevation_changes):
+def seasonal_and_other_comparisons(tulare_wells13, missing_1980, tulare_wells16, v, r, Y_irrigation, include_elevation_changes):
     print('Current progress: making seasonal comparisons')
-    for county_id in tqdm(county_IDs_all):   # runs through data for all Tulare County IDs 
+    for well_iter, county_id in enumerate(tqdm(county_IDs_all)):   # runs through data for all Tulare County IDs 
         #Data for this specific well ID: 
         tulare_wells90 = well_data_tulare_only.loc[well_data_tulare_only['CASGEM_STATION_ID'] == county_id, :]
 
-        well_iter = well_iter + 1 
+        # well_iter = well_iter + 1 
         seasonal_average_test = 'no longer calculated in this section'
 
         skip_id = 0 
@@ -538,7 +521,7 @@ def seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tula
             # x_values = np.arange(1939.5,2018.5, 0.5)                          # What is a better way? - Pandas resample
             x_values = pd.date_range(start='Sep-1939', end=' Sep-2018', freq='6M')
             # x_values = tulare_wells90.MEASUREMENT_DATE
-            y_values = imported_seasonal_averages[well_iter-1,:]
+            y_values = imported_seasonal_averages[well_iter,:]  # check to make sure it shouldn't be well_iter - 1 # june 29 
             plot_by_use = 1  #Plot averages by well use type 
             if plot_by_use == 1: 
                 plt.figure(51)
@@ -662,7 +645,7 @@ def seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tula
             seasonal_average_test = 'Test- seasonal_average is already saved in the csv file'
     # Save seasonal_averages to a .csv file
 
-    return seasonal_average_test, well_iter, tulare_wells13, tulare_wells16
+    return seasonal_average_test, tulare_wells13, tulare_wells16
 
 
 def water_drawdown_changes_1980_85():
@@ -801,7 +784,7 @@ X_irrigation[:] = np.nan
 Y_irrigation = np.empty([1800,158])    ### changed to 1800 so array is unlikely to fill
 Y_irrigation[:] = np.nan
 r = 0 
-well_iter = 0 
+# well_iter = 0 
 
 # Compile the data (set equal to zero if already done)
 if compiling_seasonal_averages == 1:    # Compiles seasonal averages of the data and saves it as "seasonal_averages.csv"
@@ -812,8 +795,8 @@ imported_seasonal_averages = import_seasonal_averages()   # imports the seasonal
 print('just imported seasonal data')
 pdb.set_trace()
 
-well_iter = 0 
-seasonal_average_test, well_iter, tulare_wells13, tulare_wells16 = seasonal_and_other_comparisons(well_iter, tulare_wells13, missing_1980, tulare_wells16, v, r, Y_irrigation, include_elevation_changes)
+# well_iter = 0 
+seasonal_average_test, tulare_wells13, tulare_wells16 = seasonal_and_other_comparisons(tulare_wells13, missing_1980, tulare_wells16, v, r, Y_irrigation, include_elevation_changes)
 
 df_well_ids_with_drawdown, water_drawdown_changes, change_year_before, lats, lons = water_drawdown_changes_1980_85()
 df_well_ids_with_drawdown.to_csv('df_well_ids_with_drawdown.csv', na_rep = "nan" , index = False  )

@@ -82,7 +82,7 @@ def create_comtrs_wellid_table():
 
 well_ids_with_comtrs_complete = create_comtrs_wellid_table()  # includes 14245 wells (114 not yet connected through QGIS)
 
-well_ids_with_comtrs_complete.to_csv('well_ids_with_comtrs_complete.csv')
+well_ids_with_comtrs_complete.to_csv( 'well_ids_with_comtrs_complete.csv', index = False)
 
 pdb.set_trace()
 

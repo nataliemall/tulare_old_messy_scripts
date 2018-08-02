@@ -1,4 +1,6 @@
 *.png
+*.pdf
+*.doc
 *.csv 
 *.npy
 test_ignore.md

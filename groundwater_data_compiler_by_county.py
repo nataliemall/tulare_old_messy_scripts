@@ -350,15 +350,26 @@ def compile_seasonal_averages():
     seasonal_average = np.empty((len(county_IDs_all),158,))
     seasonal_average[:] = np.nan
     seasonal_average[0] = 0  
-    year_range = np.arange(1940,2018)
+    year_range = np.arange(1940,2017) # changed to just 1940 
     # well_iter = 0 
+    pdb.set_trace()
+    df_seasonal_by_year = {}
 
-    for well_iter, county_id in enumerate(tqdm(county_IDs_all)):   # runs through data for all Tulare County IDs 
-        #Data for this specific well ID: 
-        tulare_wells90 = well_data_tulare_only.loc[well_data_tulare_only['CASGEM_STATION_ID'] == county_id, :]
+    for year in year_range:
+        df_seasonal = pd.DataFrame(columns = ['well_ID', 'dry_season', 'rainy_season', 'drawdown']) # overall dataframe to add to
+        df_seasonal.well_ID = np.zeros(len(county_IDs_all))
+        df_seasonal.dry_season = np.zeros(len(county_IDs_all))
+        df_seasonal.rainy_season = np.zeros(len(county_IDs_all))
+        df_seasonal.drawdown = np.zeros(len(county_IDs_all))
+        
 
-        season_iter = 0 
-        for year in year_range:
+        for well_iter, county_id in enumerate(tqdm(county_IDs_all)):   # runs through data for all Tulare County IDs 
+            #Data for this specific well ID: 
+            tulare_wells90 = well_data_tulare_only.loc[well_data_tulare_only['CASGEM_STATION_ID'] == county_id, :]
+            df_seasonal.well_ID[well_iter] = county_id
+            season_iter = 0 
+
+             # for year in year_range:
             tulare_well_ID_year = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'].dt.year == year - 1 , :]
             tulare_well_ID_year = tulare_well_ID_year.loc[tulare_well_ID_year['MEASUREMENT_DATE'].dt.month > 9, :]  # locate data betwwen october and May of year prior
             
@@ -377,8 +388,9 @@ def compile_seasonal_averages():
             average_rainy[:] = np.nan
             if combined.size > 0:
                 average_rainy = np.mean(combined)
+            # pdb.set_trace()
             seasonal_average[well_iter, season_iter] = average_rainy  # compiles average for the rainy season and places it in seasonal_average dataframe
-
+            df_seasonal.rainy_season[well_iter] = average_rainy
             # Dry season 
             tulare_well_ID_year_dry  = tulare_wells90.loc[tulare_wells90['MEASUREMENT_DATE'].dt.year == year, :]
             tulare_well_ID_year_dry  = tulare_well_ID_year_dry.loc[tulare_well_ID_year_dry['MEASUREMENT_DATE'].dt.month > 4, :]  # locate data betwwen october and May year + 1
@@ -386,14 +398,24 @@ def compile_seasonal_averages():
 
             dry_season_values = tulare_well_ID_year_dry.RP_READING.values 
 
+
             if dry_season_values.size > 0:
                 seasonal_average[well_iter, season_iter + 1] = np.mean(tulare_well_ID_year_dry.RP_READING)
+            df_seasonal.dry_season[well_iter] = dry_season_values.mean()
 
+            df_seasonal.drawdown[well_iter] = df_seasonal.dry_season[well_iter] - df_seasonal.rainy_season[well_iter]
+                # Create pandas dataframe here 
             season_iter = season_iter + 2
 
-        # well_iter = well_iter + 1  
-        # pdb.set_trace()
+            # well_iter = well_iter + 1  
+            # pdb.set_trace()
     
+        df_seasonal_by_year[year] = df_seasonal
+    
+        title = str('seasonal_df_year' +  str(year) + '.csv')
+        df_seasonal.to_csv(title )
+
+    pdb.set_trace()
     np.savetxt("seasonal_averages.csv", seasonal_average, delimiter=",")
     np.savetxt("seasonal_averages_corresponding_IDs.csv", county_IDs_all, delimiter=",")
 
@@ -764,7 +786,7 @@ def create_csv_for_arcgis(filename, county_id5, lats, lons, RP_difference):
 # counties = 'Tulare'
 counties = 'All'   ############# not yet complete: this doesn't actually implement since it first tries to use the cvs file already stored 
 include_elevation_changes = 1 # include elevation compared to year before - will calculate these IF the file does not exist 
-compiling_seasonal_averages = 0 # takes the data and compiles average RP_READING for each season (set equal to 1 if this hasn't already been done)
+compiling_seasonal_averages = 1 # takes the data and compiles average RP_READING for each season (set equal to 1 if this hasn't already been done)
 
 well_data_tulare_only, county_headers, county_IDs_all = get_CASGEM_data(counties, include_elevation_changes)
 
@@ -789,8 +811,10 @@ r = 0
 # Compile the data (set equal to zero if already done)
 if compiling_seasonal_averages == 1:    # Compiles seasonal averages of the data and saves it as "seasonal_averages.csv"
     compile_seasonal_averages()
+pdb.set_trace()
 
 # import the data necessary 
+# if compile_seasonal_averages
 imported_seasonal_averages = import_seasonal_averages()   # imports the seasonal average data as imported_seasonal_averages
 print('just imported seasonal data')
 pdb.set_trace()

@@ -548,7 +548,7 @@ def load_crop_type_all_year(irrigation_district):  # loads the data already calc
 # plt.plot(year_list, total_annual_acreage)
 
 
-def plot_crop_comparison(tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year ): 
+def plot_crop_comparison(irrigation_district, tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year ): 
     year_list_array = np.arange(1990, 2017)
     fig, ax = plt.subplots()
     #plotted using the numpy arrays: 
@@ -556,7 +556,7 @@ def plot_crop_comparison(tree_acreage_summed_for_year,annual_acreage_summed_for_
     ax.plot(year_list_array[1:26], annual_acreage_summed_for_year[1:26], label = 'annual crop acreage')
     ax.plot(year_list_array[1:26], forage_acreage_summed_for_year[1:26], label = 'forage crop acreage')
     plt.legend()
-    ax.set_title('Tulare County Crop Type Changes 1991 - 2016 with span_region ')
+    ax.set_title(str(irrigation_district + ' Crop Type Changes Dataset Comparison '))
     plt.ylabel('Total acres planted')
 
     logic_rule = ( (year_list_array > 2010) & (year_list_array < 2016)) # or (year_list_array > 1991 & year_list_array < 1995))  
@@ -795,6 +795,8 @@ make_timeseries_plots = 0
 if make_timeseries_plots == 1: 
     make_timeseries_plots()
 
+
+irrigation_district = 'Fresno_County'
 overall_with_tree_crop_column, tree_list  = define_tree_crops(overall_data)
 
 calPIP_crop_types = pd.read_csv('/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages/overall_results_transposed.csv', sep = ',', index_col = 0)
@@ -804,18 +806,18 @@ crop_compiling_option = 1
 # Option 1: calculate all the data: 
 if crop_compiling_option == 1:
     (all, total_tree_acreage_dict, tree_acreage_summed_for_year, annual_acreage_summed_for_year, 
-        forage_acreage_summed_for_year, percent_tree_acreage_summed_for_year) = group_by_crop_type_all_year('Tulare_County')
+        forage_acreage_summed_for_year, percent_tree_acreage_summed_for_year) = group_by_crop_type_all_year(irrigation_district)
 
 # Option 2: Load all the data to avoid re-calculating everything
 if crop_compiling_option == 2: 
     (all, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year, 
-        percent_tree_acreage_summed_for_year) = load_crop_type_all_year('Tulare_County')
+        percent_tree_acreage_summed_for_year) = load_crop_type_all_year(irrigation_district)
 
 plotting_overall_acreages = 1
 if plotting_overall_acreages ==1:
 
     # Plot the comparisons of tree types 
-    plot_crop_comparison(tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year )
+    plot_crop_comparison(irrigation_district, tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year )
 
     pdb.set_trace()
     # plots just for Tulary County 

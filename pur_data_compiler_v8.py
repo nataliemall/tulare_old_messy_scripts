@@ -15,7 +15,7 @@ from tqdm import tqdm  # for something in tqdm(something something):
 
 def add_comtrs(year): #adds the comtrs as a column # preliminary processing of 1974 - 1989 data
 
-    overall_data = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/pur' + str(year) + '.txt'), sep = '\t')
+    overall_data = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) + '.txt'), sep = '\t')
     # pdb.set_trace()
     # tlb_overall_data = overall_data[overall_data.county_cd == 54] 16 15 10
 
@@ -89,10 +89,10 @@ def process_post_1989_data(year):#adds the comtrs as a column # preliminary proc
     final_two_digits = final_two_digits[-2:]
     # pdb.set_trace()
     # Extract data from counties 10, 15, 16, 54
-    overall_data_fresno = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/pur' + str(year) +'/udc' + final_two_digits + '_10_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
-    overall_data_kern = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/pur' + str(year) +'/udc' + final_two_digits + '_15_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
-    overall_data_kings = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/pur' + str(year) +'/udc' + final_two_digits + '_16_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
-    overall_data_tulare = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/pur' + str(year) +'/udc' + final_two_digits + '_54_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_fresno = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_10_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_kern = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_15_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_kings = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_16_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_tulare = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_54_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
 
     full_dataset = [overall_data_fresno, overall_data_kern, overall_data_kings, overall_data_tulare]
 
@@ -210,10 +210,10 @@ def add_comtrs_2005_2016(year): #adds the comtrs as a column # preliminary proce
     final_two_digits = final_two_digits[-2:]
     # pdb.set_trace()
     # Extract data from counties 10, 15, 16, 54
-    overall_data_fresno = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/pur' + str(year) +'/udc' + final_two_digits + '_10_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
-    overall_data_kern = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/pur' + str(year) +'/udc' + final_two_digits + '_15_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
-    overall_data_kings = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/pur' + str(year) +'/udc' + final_two_digits + '_16_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
-    overall_data_tulare = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/pur' + str(year) +'/udc' + final_two_digits + '_54_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_fresno = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_10_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_kern = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_15_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_kings = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_16_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_tulare = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_54_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
 
     full_dataset = [overall_data_fresno, overall_data_kern, overall_data_kings, overall_data_tulare]
 
@@ -231,7 +231,7 @@ def read_data(year):
         # pdb.set_trace()
         year_string = str(year) 
         year_two_digits = year_string[-2:]
-        directory='/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/data_with_comtrs'
+        directory='/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/data_with_comtrs'
 
         # directory = 
         tlb_overall_data = pd.read_csv(os.path.join(directory, str('comtrs_pur_vals_year' + year_two_digits + '.csv') ) )
@@ -248,7 +248,7 @@ def read_data(year):
         # print('stopped year, 1990-2016 in read_data function')
         year_string = str(year) 
         year_two_digits = year_string[-2:]
-        directory='/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/data_with_comtrs'
+        directory='/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/data_with_comtrs'
         tlb_overall_data = pd.read_csv(os.path.join(directory, str('comtrs_pur_vals_year' + year_string + '.csv') ) )
         crop_list = np.int64(tlb_overall_data.site_code.unique())
         # pdb.set_trace()
@@ -424,6 +424,9 @@ def calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall
 
         crop_acres_list[COMTRS_iter] = total_in_COMTRS  #puts all of this crop for this comtrs in the crop_acres_list
     
+    # pdb.set_trace()
+    print('This point was reached yay')
+
     try:
         crop2_df[lambda crop2_df: crop2_df.columns[0]] = crop_acres_list  # crop acreage list for this specific crop 
 
@@ -446,19 +449,22 @@ def calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall
 
             # comtrs_with_crop
     except:
-        print('crop2_df make have been empty for this crop type')
-    return crop2_df, directory, crop_column, crop_iter, crop_acres_tulare
+        print('crop2_df may have been empty for this crop type')
+
+    # pdb.set_trace()
+    return crop2_df, crop_column, crop_iter, crop_acres_tulare
 
 
 def compile_data_by_comtrs(year): 
     '''Compiles 1974 - 1998 data by comtrs'''
     crop_list, tlb_overall_data = read_data(year)
     crop4_df, tulare_overall_by_crop = make_dataframe(year, tlb_overall_data, crop_list)    # make dataframe for the crop acreage summations     
-
+    # pdb.set_trace()
     crop_iter = 0 
     if year < 1990:
         for crop_type in tqdm(crop_list):  # Runs for each crop type in calPIP database, then connects to larger calPIP array using COMTRS index 
             try:
+                # deleted variable directory - hopefully this solves it!!! 
                 crop2_df, directory, crop_column, crop_iter, crop_acres_tulare = calculate_acres_pre_1990(year, crop_type, crop_iter, crop_list, tlb_overall_data)  # sum up acreages for each crop type 
                 # pdb.set_trace()
                 crop4_df[crop_column] = crop2_df[str(crop_column)].loc[crop2_df.index]  # Puts the individual crop acreage list into the overall dataframe crop4_df 
@@ -468,12 +474,17 @@ def compile_data_by_comtrs(year):
     if year > 1989:
         for crop_type in tqdm(crop_list):  # Runs for each crop type in calPIP database, then connects to larger calPIP array using COMTRS index 
             try:
-                crop2_df, directory, crop_column, crop_iter, crop_acres_tulare = calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall_data)  # sum up acreages for each crop type 
+                # pdb.set_trace()
+                # print('run this by hand')
+                crop2_df, crop_column, crop_iter, crop_acres_tulare = calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall_data)  # sum up acreages for each crop type 
+                print('This never gets printed so idt it''s working')
                 # pdb.set_trace()
                 crop4_df[crop_column] = crop2_df[str(crop_column)].loc[crop2_df.index]  # Puts the individual crop acreage list into the overall dataframe crop4_df 
                 # tulare_overall_by_crop[crop_column] = crop_acres_tulare
+                print(f'crop2 dataframe EXISTS for crop type number {crop_type}') 
             except:
                 print(f'crop2 dataframe may have been empty for this crop type number {crop_type}')    
+    
     # pdb.set_trace()    
     crop5_df = crop4_df.reset_index()
     # test = test.set_index('level_0')
@@ -481,7 +492,8 @@ def compile_data_by_comtrs(year):
     year_string = str(year) 
     year_two_digits = year_string[-2:]
     directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26', year_two_digits + 'files' )
-    # directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages/pur_pre_1990/data_with_comtrs/')
+    # pdb.set_trace()
+    # directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages/pur_data_raw/data_with_comtrs/')
     try:
         crop5_df.to_csv(os.path.join(directory, ('all_data_year' + year_two_digits + '_by_COMTRS' + '.csv' ) ), header = True, na_rep = '0', index = False, sep = '\t')
     except:
@@ -497,8 +509,8 @@ def retrieve_data_for_irrigation_district(irrigation_district):
     except:
         comtrs_in_irrigation_dist = pd.read_csv(irrigation_district_data, usecols = ['CO_MTRS']) 
 
-    crop_list = ['year', 'alfalfa', 'almonds', 'cotton', 'all_tree_crops', 'all_crops', 'percent_tree_crops' ]
-    df_shape = (len(range(1974,2004)), len(crop_list))
+    crop_list = ['year', 'alfalfa', 'almonds', 'cotton', 'all_tree_crops', 'all_annual_crops', 'all_crops', 'percent_tree_crops' ]
+    df_shape = (len(range(1974,2017)), len(crop_list))
     zero_fillers = np.zeros(df_shape)
     sum_crop_types = pd.DataFrame(zero_fillers, columns = [ crop_list ] )
 
@@ -525,13 +537,13 @@ def retrieve_data_for_irrigation_district(irrigation_district):
 
     # pdb.set_trace()
         # crop4_df = pd.DataFrame(array_zeros1, index = [all_COMTRS], columns = [ crop_list ] ) 
-    for df_row, year in tqdm(enumerate(range(1974,2004))):
+    for df_row, year in tqdm(enumerate(range(1974,2017))):    # editted here to include up to 2016 
         year_string = str(year) 
         year_two_digits = year_string[-2:]
         year_date_time = pd.to_datetime(year, format='%Y')
-        directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages', year_two_digits + 'files' )
+        directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26', year_two_digits + 'files' )
 
-        # directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/data_with_comtrs/')
+        # directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/data_with_comtrs/')
         comtrs_compiled_data = pd.read_csv(os.path.join(directory, ('all_data_year' + year_two_digits + '_by_COMTRS' + '.csv' )), sep = '\t')
         # pdb.set_trace()
         # print('find county column here')
@@ -557,6 +569,7 @@ def retrieve_data_for_irrigation_district(irrigation_district):
             sum_nectarine = sum(crop_data_in_irrigation_district['2303'])
         else:
             tree_crop_columns = crop_data_in_irrigation_district.columns[crop_data_in_irrigation_district.columns.isin(tree_crops_1990_2016)]  # Columns that are tree crops 
+            print(tree_crop_columns)
             annual_crop_columns = crop_data_in_irrigation_district.columns[crop_data_in_irrigation_district.columns.isin(annual_crops_1990_2016)]  # Columns that are tree crops 
             # pdb.set_trace()
             sum_alfalfa = sum(crop_data_in_irrigation_district['23001'])
@@ -576,14 +589,17 @@ def retrieve_data_for_irrigation_district(irrigation_district):
         # tlb_overall_data['comtrs'].iloc[num]
         if year == 1977 or year == 1983 or year == 1987:
             print(f'the year is paused at {year}')
-            pdb.set_trace()
+            # pdb.set_trace()
         sum_crop_types.iloc[df_row]['year'] = year_date_time.year 
         sum_crop_types.iloc[df_row]['alfalfa'] = str(sum_alfalfa)
         sum_crop_types.iloc[df_row]['all_tree_crops'] = str(acreage_of_all_tree_crops)
+        sum_crop_types.iloc[df_row]['all_annual_crops'] = str(acreage_of_all_annual_crops)
         sum_crop_types.iloc[df_row]['all_crops'] = str(acreage_of_all_crops)
+
         sum_crop_types.iloc[df_row]['percent_tree_crops'] = str(acreage_of_all_tree_crops / acreage_of_all_crops * 100)
         sum_crop_types.set_index('year')
 
+        sum_crop_types.to_csv(str('calPUR_data' + str(irrigation_district)), index = False) 
         # sum_crop_types.year = pd.to_datetime(sum_crop_types.year, format='%Y')
         # sum_crop_types.year.to_datetime()
         # pdb.set_trace()
@@ -594,17 +610,121 @@ def retrieve_data_for_irrigation_district(irrigation_district):
     return sum_crop_types, crop_data_in_irrigation_district, irrigation_district
 
 
-def load_crop_type_all_year():  # loads (from calPIP dataset 1990-2016) the data already calculated rather than recalculate it all 
-    pdb.set_trace()
-    all = np.load('all_crops_compiled_with_crop_types.npy').item()
-    tree_acreage_summed_for_year = np.loadtxt('tree_acreage_summed_for_year.csv')
-    annual_acreage_summed_for_year = np.loadtxt('annual_acreage_summed_for_year.csv')
-    forage_acreage_summed_for_year = np.loadtxt('forage_acreage_summed_for_year.csv')
-    percent_tree_acreage_summed_for_year = np.loadtxt('percent_tree_acreage_summed_for_year.csv')
+def county_commissioner_data(irrigation_district):
+    county_name = irrigation_district.split('_')[0]
 
+    cols = ['year', 'comcode', 'crop', 'coucode', 'county', 'acres', 'yield', 'production', 'ppu', 'unit', 'value']
+    df_all = pd.read_csv('CA-crops-1980-2016.csv', index_col=0, parse_dates=True, names=cols, low_memory=False).fillna(-99)
+    df = df_all[df_all.county==county_name]
+
+    # first: what crops are highest value total (top 10 in 2016)
+    print(df[df.index=='2016'].sort_values(by='value', ascending=False).head(10))
+    highest_valued = df[df.index=='2016'].sort_values(by='value', ascending=False).head(10)
+    # crops of greatest acreage
+    print(df[df.index=='2016'].sort_values(by='acres', ascending=False).head(10))
+    highest_acres = df[df.index=='2016'].sort_values(by='acres', ascending=False).head(10)
+
+    df_tulare = df_all[df_all.county=='Tulare']
+    df_kern = df_all[df_all.county=='Kern']
+    df_kings = df_all[df_all.county=='Kings']
+    df_fresno = df_all[df_all.county=='Fresno']
+
+    county_commissioner_codes = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages/county_commissioner_crop_types.csv') 
+    tree_crops_cc = county_commissioner_codes.site_code_cc.loc[county_commissioner_codes.is_orchard_crop == 1]
+    annual_crops_cc = county_commissioner_codes.site_code_cc.loc[county_commissioner_codes.is_annual_crop == 1]
+    forage_crops_cc = county_commissioner_codes.site_code_cc.loc[county_commissioner_codes.is_forage_crop == 1]
+
+    crop_list = ['year', 'all_tree_crops', 'all_annual_crops', 'all_crops', 'percent_tree_crops' ]
+    df_shape = (len(range(1980,2017)), len(crop_list))
+    zero_fillers = np.zeros(df_shape)
+    sum_cc_crop_types = pd.DataFrame(zero_fillers, columns = [ crop_list ] )
+
+    for df_row, year in tqdm(enumerate(range(1980,2017))):
+        year_date_time = pd.to_datetime(year, format='%Y')
+        df_this_year = df[df.index == str(year) ]
+        df_real_acreages_only = df_this_year[df_this_year.acres > 0 ]
+
+        tree_crops_this_year_this_county = df_real_acreages_only[df_real_acreages_only.crop.isin(tree_crops_cc)]  # Columns that are tree crops 
+        annual_crops_this_year_this_county = df_real_acreages_only[df_real_acreages_only.crop.isin(annual_crops_cc)]  # Columns that are tree crops 
+        forage_crops_this_year_this_county = df_real_acreages_only[df_real_acreages_only.crop.isin(forage_crops_cc)]
+
+        tree_crops_this_year = tree_crops_this_year_this_county.acres.sum()
+        annual_crops_this_year = annual_crops_this_year_this_county.acres.sum()
+        forage_crops_this_year = forage_crops_this_year_this_county.acres.sum()
+        # pdb.set_trace()
+        acreage_of_all_crops = tree_crops_this_year + annual_crops_this_year + forage_crops_this_year
+
+        sum_cc_crop_types.iloc[df_row]['year'] = year_date_time.year 
+        sum_cc_crop_types.iloc[df_row]['all_tree_crops'] = str(tree_crops_this_year)
+        sum_cc_crop_types.iloc[df_row]['all_annual_crops'] = str(annual_crops_this_year)
+        sum_cc_crop_types.iloc[df_row]['all_crops'] = str(acreage_of_all_crops)
+
+        sum_cc_crop_types.iloc[df_row]['percent_tree_crops'] = str(tree_crops_this_year / acreage_of_all_crops * 100)
+        sum_cc_crop_types.set_index('year')
+        # pdb.set_trace()
+
+    sum_cc_crop_types.to_csv(str('cc_data' + str(irrigation_district) + '.csv'), index = False) 
+        # annual_crop_columns = crop_data_in_irrigation_district.columns[crop_data_in_irrigation_district.columns.isin(annual_crops_1990_2016)]  # Columns that are tree crops 
+
+    return sum_cc_crop_types
+
+
+############## start of calPIP dataset functions #################
+
+def load_crop_type_all_year(irrigation_district):  # loads the data already calculated rather than recalculate it all 
+    all = np.load(str(irrigation_district + 'all_crops_compiled_with_crop_types.npy')).item()
+    tree_acreage_summed_for_year = np.loadtxt(str(irrigation_district + 'tree_acreage_summed_for_year.csv'))
+    annual_acreage_summed_for_year = np.loadtxt(str(irrigation_district + 'annual_acreage_summed_for_year.csv'))
+    forage_acreage_summed_for_year = np.loadtxt(str(irrigation_district + 'forage_acreage_summed_for_year.csv'))
+    percent_tree_acreage_summed_for_year = np.loadtxt(str(irrigation_district + 'percent_tree_acreage_summed_for_year.csv'))
+    # pdb.set_trace()
     return all, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year, percent_tree_acreage_summed_for_year
     # print(read_dictionary['hello']) # displays "world"
 
+def plot_dataset_comparison(irrigation_district, tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year, sum_crop_types, sum_cc_crop_types ): 
+    year_list_array = np.arange(1990, 2017)
+    fig, ax = plt.subplots()
+    linestyles = ['-', '--', '-.', ':']
+    # add calPIP data 
+    ax.plot(year_list_array[1:27], tree_acreage_summed_for_year[1:27], linestyle = ':', label = 'tree crop acreage')
+    ax.plot(year_list_array[1:27], annual_acreage_summed_for_year[1:27],linestyle = ':',  label = 'annual crop acreage')
+    # ax.plot(year_list_array[1:27], forage_acreage_summed_for_year[1:27], label = 'forage crop acreage')
+    ax.set_title(str(irrigation_district + ' Crop Type Changes Dataset Comparison '))
+    plt.ylabel('Total acres planted')
+
+    add_droughts = 0 
+    if add_droughts == 1 :
+        logic_rule = ( (year_list_array > 2010) & (year_list_array < 2016)) # or (year_list_array > 1991 & year_list_array < 1995))  
+        collection = collections.BrokenBarHCollection.span_where(year_list_array, ymin=0, ymax=1000000, where=(logic_rule), facecolor='orange', alpha=0.3)
+        ax.add_collection(collection)
+        logic_rule2 =  ( (year_list_array < 1995) & (year_list_array > 1990)  )   
+        collection2 = collections.BrokenBarHCollection.span_where(year_list_array, ymin=0, ymax=1000000, where=(logic_rule2), facecolor='orange', alpha=0.3)
+        ax.add_collection(collection2)
+
+    # add calPUR data: 
+    x_vals = sum_crop_types.year.values
+    y_vals = sum_crop_types.all_tree_crops.values
+    # pdb.set_trace()
+    ax.plot(x_vals, y_vals, label = 'calPUR tree crop acreage')
+
+    annual_crop_y_vals = sum_crop_types.all_annual_crops.values
+    ax.plot(x_vals, annual_crop_y_vals, label = 'calPUR annual crop acreage')
+
+    # pdb.set_trace()
+    # add County Commissioner Data:
+    x_vals_cc = sum_cc_crop_types.year.values
+    y_vals_tree_cc = sum_cc_crop_types.all_tree_crops.values
+    y_vals_annual_cc = sum_cc_crop_types.all_annual_crops.values
+    ax.plot(x_vals_cc, y_vals_tree_cc, linestyle = '-.', label = 'County Commissioner tree crop acreage')
+    ax.plot(x_vals_cc, y_vals_annual_cc, linestyle = '-.', label = 'County Commissioner annual crop acreage')    
+
+
+    ax.plot()
+    plt.legend()
+
+    plt.show()
+
+############## end of calPIP dataset functions #################
 
 
 def plot_data_for_irrigation_district(irrigation_district, sum_crop_types):
@@ -633,9 +753,12 @@ def plot_tree_crop_percentages_for_irrigation_district(irrigation_district, sum_
 #     add_comtrs(year)  # preliminary processing of 1974 - 1989 data
 # pdb.set_trace()
 
+# year = 1990
+# compile_data_by_comtrs(year) 
 
-# for year in range(1974,2004):
+# for year in range(1990,2017):
 #     compile_data_by_comtrs(year)  # compile 1974 - 1989 data by comtrs   - this is where it really depends how you slice it with the calculate_acreas() fuction
+#         # attempted to use this function post 1989 as well - need to fix!!!
 # pdb.set_trace()
 
 #Step 2: add the comtrs columns to 1989 - 2004 data (already completed for 1990-2002)
@@ -647,20 +770,16 @@ def plot_tree_crop_percentages_for_irrigation_district(irrigation_district, sum_
 # for year in range(2006,2017):
 #     add_comtrs_2005_2016(year)
 
-pdb.set_trace()
-# print('Completed years 2000 - 2007')
-# pdb.set_trace()
 
-# pdb.set_trace()
-
+# Step 4: save data for a specific region: 
 # sum_crop_types, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district('Tulare_Lake_Basin_Water_Storage_District')
 # pdb.set_trace()
 
-# sum_crop_types, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district('Tulare_County')
+irrigation_district = 'Kings_County'
+# sum_crop_types, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district)
 # sum_crop_types, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district('Kern_County')
 # sum_crop_types, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district('Kings_County')
 # sum_crop_types, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district('Fresno_County')
-
 
 # sum_crop_types, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district('Cawelo_Water_District')
 # sum_crop_types, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district('North_Kern_Water_Storage_District')
@@ -671,7 +790,21 @@ pdb.set_trace()
 # plot_tree_crop_percentages_for_irrigation_district(irrigation_district, sum_crop_types)
 
 
-load_crop_type_all_year()
+# Load County Commissioner dataset 
+sum_cc_crop_types = county_commissioner_data(irrigation_district)
+pdb.set_trace()
+
+# Load calPUR dataset 
+sum_crop_types = pd.read_csv(str('calPUR_data' + str(irrigation_district)))
+
+# Load calPIP dataset 
+(all, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year, 
+    percent_tree_acreage_summed_for_year) = load_crop_type_all_year(irrigation_district)
+
+
+
+# Plot combination of datasets: 
+plot_dataset_comparison(irrigation_district, tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year, sum_crop_types, sum_cc_crop_types )
 
 
 pdb.set_trace()

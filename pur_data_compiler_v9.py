@@ -13,9 +13,11 @@ import re
 from tqdm import tqdm  # for something in tqdm(something something):
 
 
-def add_comtrs(year): #adds the comtrs as a column # preliminary processing of 1974 - 1989 data
+def add_comtrs_pre_1990(year): #adds the comtrs as a column # preliminary processing of 1974 - 1989 data
+    final_two_digits = str(year)
+    final_two_digits = final_two_digits[-2:]
 
-    overall_data = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) + '.txt'), sep = '\t')
+    overall_data = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(final_two_digits) + '.txt'), sep = '\t')
     # pdb.set_trace()
     # tlb_overall_data = overall_data[overall_data.county_cd == 54] 16 15 10
 
@@ -57,34 +59,52 @@ def add_comtrs(year): #adds the comtrs as a column # preliminary processing of 1
     # for comtrs in range(len(tlb_overall_data)): 
     # pdb.set_trace()
 
-    for num in tqdm(range(len_dataset)): 
 
-        if (np.isreal(tlb_section[num]) and np.isreal(tlb_range[num]) and np.isreal(tlb_township[num])
-            and np.absolute(tlb_section[num]) > - 50 and np.abs(tlb_range[num]) > - 50 and np.abs(tlb_township[num]) > -50) :
+    array_township = tlb_overall_data.township.values 
+    string_list_township = [str(item).zfill(2) for item in array_township]
+    tlb_overall_data["township_string"] = string_list_township
 
-            tlb_overall_data.section.iloc[num] = str(tlb_section[num]).zfill(2)  #ensures section data is 2 characters long
-            tlb_overall_data.range.iloc[num] = str(tlb_range[num]).zfill(2)  #ensures section data is 2 characters long
-            tlb_overall_data.township.iloc[num] = str(tlb_township[num]).zfill(2)  #ensures section data is 2 characters long
+    array_range = tlb_overall_data.range.values 
+    string_list_range = [str(item).zfill(2) for item in array_range]
+    tlb_overall_data["range_string"] = string_list_range
 
-            fields = (str(tlb_overall_data.county_cd.iloc[num]), str(tlb_overall_data.base_ln_mer.iloc[num]) 
-                , str(tlb_overall_data.township.iloc[num]) , str(tlb_overall_data.tship_dir.iloc[num]) 
-                , str(tlb_overall_data.range.iloc[num]) , str(tlb_overall_data.range_dir.iloc[num]) , str(tlb_overall_data.section.iloc[num])  )
-            # pdb.set_trace()
-            # test = str(tlb_overall_data.county_cd.iloc[num]).join( str(tlb_overall_data.base_ln_mer.iloc[num]) )
-            # fields = [ str(tlb_overall_data.county_cd.iloc[num]), tlb_overall_data.base_ln_mer.iloc[num] ]
-            # test = ''.join( str(tlb_overall_data.base_ln_mer.iloc[num]), str(tlb_overall_data.county_cd.iloc[num])  )
+    array_section = tlb_overall_data.section.values
+    string_list_section = [str(item).zfill(2) for item in array_section]
+    tlb_overall_data["section_string"] = string_list_section
 
-            tlb_overall_data['comtrs'].iloc[num] = ''.join(fields)
-        else:
-            tlb_overall_data['comtrs'].iloc[num]  = 'error'
-        # tlb_overall_data['comtrs'].iloc[num] = COMTRS.comtrs[num]
     # pdb.set_trace()
+
+    # for num in tqdm(range(len_dataset)): 
+
+    #     if (np.isreal(tlb_section[num]) and np.isreal(tlb_range[num]) and np.isreal(tlb_township[num])
+    #         and np.absolute(tlb_section[num]) > - 50 and np.abs(tlb_range[num]) > - 50 and np.abs(tlb_township[num]) > -50) :
+
+    #         tlb_overall_data.section.iloc[num] = str(tlb_section[num]).zfill(2)  #ensures section data is 2 characters long
+    #         tlb_overall_data.range.iloc[num] = str(tlb_range[num]).zfill(2)  #ensures section data is 2 characters long
+    #         tlb_overall_data.township.iloc[num] = str(tlb_township[num]).zfill(2)  #ensures section data is 2 characters long
+
+    #         fields = (str(tlb_overall_data.county_cd.iloc[num]), str(tlb_overall_data.base_ln_mer.iloc[num]) 
+    #             , str(tlb_overall_data.township.iloc[num]) , str(tlb_overall_data.tship_dir.iloc[num]) 
+    #             , str(tlb_overall_data.range.iloc[num]) , str(tlb_overall_data.range_dir.iloc[num]) , str(tlb_overall_data.section.iloc[num])  )
+    #         # pdb.set_trace()
+    #         # test = str(tlb_overall_data.county_cd.iloc[num]).join( str(tlb_overall_data.base_ln_mer.iloc[num]) )
+    #         # fields = [ str(tlb_overall_data.county_cd.iloc[num]), tlb_overall_data.base_ln_mer.iloc[num] ]
+    #         # test = ''.join( str(tlb_overall_data.base_ln_mer.iloc[num]), str(tlb_overall_data.county_cd.iloc[num])  )
+
+    #         tlb_overall_data['comtrs'].iloc[num] = ''.join(fields)
+    #     else:
+    #         tlb_overall_data['comtrs'].iloc[num]  = 'error'
+    #     # tlb_overall_data['comtrs'].iloc[num] = COMTRS.comtrs[num]
+    # # pdb.set_trace()
+
+    tlb_overall_data["comtrs"] = (tlb_overall_data["county_cd"].map(str) + tlb_overall_data["base_ln_mer"] + tlb_overall_data["township_string"]  + tlb_overall_data["tship_dir"] + tlb_overall_data["range_string"] + tlb_overall_data["range_dir"] + tlb_overall_data["section_string"])
+
 
     tlb_overall_data.to_csv(str('comtrs_pur_vals_year' + str(year) + '.csv'), index = False )
     # pdb.set_trace()
 
 
-def process_post_1989_data(year):#adds the comtrs as a column # preliminary processing of 1990 - 2004 data
+def add_comtrs_1990_2004(year): #adds the comtrs as a column # preliminary processing of 1990 - 2004 data
     final_two_digits = str(year)
     final_two_digits = final_two_digits[-2:]
     # pdb.set_trace()
@@ -166,34 +186,74 @@ def process_post_1989_data(year):#adds the comtrs as a column # preliminary proc
         COMTRS2 = np.zeros(len_dataset)
         COMTRS['comtrs'] = COMTRS2
         dataset['comtrs'] = np.zeros((len_dataset))
-        for num in tqdm(range(len_dataset)):   # range(len_dataset)
-            if (np.isreal(tlb_section[num]) and np.isreal(tlb_range[num]) and np.isreal(tlb_township[num])
-                and np.absolute(tlb_section[num]) > - 50 and np.abs(tlb_range[num]) > - 50 and np.abs(tlb_township[num]) > -50) :
 
-                try:
-                    dataset.section.iloc[num] = str(dataset.section[num]).zfill(2)  #ensures section data is 2 characters long
-                    dataset.range.iloc[num] = str(dataset.range[num]).zfill(2)  #ensures section data is 2 characters long
-                    dataset.township.iloc[num] = str(dataset.township[num]).zfill(2)  #ensures section data is 2 characters long
-                    # pdb.set_trace()
-                except:
-                    dataset.section.iloc[num] = 99 
-                    dataset.range.iloc[num] = 99  
-                    dataset.township.iloc[num] = 99 
-                    print(f'error_bad_lines {dataset.section.iloc[num]}, {dataset.range.iloc[num]}, {dataset.township.iloc[num]}')
-                    # pdb.set_trace()
 
-                # Figure out how to round townships, ranges, etc so they no longer are written as "16.0", etc
-                fields = (str(dataset.county_cd.iloc[num]), str(dataset.base_ln_mer.iloc[num]) 
-                    , str(dataset.township.iloc[num]) , str(dataset.tship_dir.iloc[num]) 
-                    , str(dataset.range.iloc[num]) , str(dataset.range_dir.iloc[num]) , str(dataset.section.iloc[num])  )
+        # pdb.set_trace()
 
-                dataset['comtrs'].iloc[num] = ''.join(fields)
-                # pdb.set_trace()
-                # print('check that comtrs value actually equals comtrs here')
-            else:
-                dataset['comtrs'].iloc[num]  = 'error'
+        try:
+            array_township = dataset.township.values 
+            string_list_township = [str(item).zfill(2) for item in array_township]
+            dataset["township_string"] = string_list_township
+
+            array_range = dataset.range.values 
+            string_list_range = [str(item).zfill(2) for item in array_range]
+            dataset["range_string"] = string_list_range
+
+            array_section = dataset.section.values
+            string_list_section = [str(item).zfill(2) for item in array_section]
+            dataset["section_string"] = string_list_section
+
+        except:
+            print('error here')
+
+        # pdb.set_trace()
+        print('fix this before going into the loop that takes forever')
+
+        dataset["comtrs"] = (dataset["county_cd"].map(str) + dataset["base_ln_mer"] + dataset["township_string"]  + dataset["tship_dir"] + dataset["range_string"] + dataset["range_dir"] + dataset["section_string"])
+
+
+        ################# Loop commented out for speed ####################
+        # for num in tqdm(range(len_dataset)):   # range(len_dataset)
+        #     if (np.isreal(tlb_section[num]) and np.isreal(tlb_range[num]) and np.isreal(tlb_township[num])
+        #         and np.absolute(tlb_section[num]) > - 50 and np.abs(tlb_range[num]) > - 50 and np.abs(tlb_township[num]) > -50) :
+
+        #         #         try:
+        #         #             dataset.section.iloc[num] = str(dataset.section[num]).zfill(2)  #ensures section data is 2 characters long
+        #         #             dataset.range.iloc[num] = str(dataset.range[num]).zfill(2)  #ensures section data is 2 characters long
+        #         #             dataset.township.iloc[num] = str(dataset.township[num]).zfill(2)  #ensures section data is 2 characters long
+        #         #             # pdb.set_trace()
+        #         #         except:
+        #         #             dataset.section.iloc[num] = 99 
+        #         #             dataset.range.iloc[num] = 99  
+        #         #             dataset.township.iloc[num] = 99 
+        #         #             print(f'error_bad_lines {dataset.section.iloc[num]}, {dataset.range.iloc[num]}, {dataset.township.iloc[num]}')
+        #         #             # pdb.set_trace()
+        #         #         # print('check that comtrs value actually equals comtrs here')
+        #         #     else:
+        #         #         dataset['comtrs'].iloc[num]  = 'error'
+        #         fields = (str(dataset.county_cd.iloc[num]), str(dataset.base_ln_mer.iloc[num]) 
+        #             , str(string_list_township[num]) , str(dataset.tship_dir.iloc[num]) 
+        #             , str(string_list_range[num]) , str(dataset.range_dir.iloc[num]) , str(string_list_section[num])  )
+        #     # pdb.set_trace()
+        #     # test = str(tlb_overall_data.county_cd.iloc[num]).join( str(tlb_overall_data.base_ln_mer.iloc[num]) )
+        #     # fields = [ str(tlb_overall_data.county_cd.iloc[num]), tlb_overall_data.base_ln_mer.iloc[num] ]
+        #     # test = ''.join( str(tlb_overall_data.base_ln_mer.iloc[num]), str(tlb_overall_data.county_cd.iloc[num])  )
+
+        #     dataset['comtrs'].iloc[num] = ''.join(fields)
+
+        # pdb.set_trace()
+        # Figure out how to round townships, ranges, etc so they no longer are written as "16.0", etc
+        # # brought this outside of the for loop 
+        # fields = (str(dataset.county_cd), str(dataset.base_ln_mer) 
+        #     , str(dataset.township) , str(dataset.tship_dir) 
+        #     , str(dataset.range) , str(dataset.range_dir) , str(dataset.section)  )
+
+        # test = ''.join()
+        # pdb.set_trace()
+        # dataset['comtrs'].iloc[num] = ''.join(fields)
+
         dataset = dataset.set_index(['comtrs'])
-
+                # pdb.set_trace()
         if dataset_num == 0:
             tlb_overall_data = dataset
         else:
@@ -228,31 +288,32 @@ def add_comtrs_2005_2016(year): #adds the comtrs as a column # preliminary proce
 
 
 def read_data(year):
-    if year < 1990:
         # pdb.set_trace()
-        year_string = str(year) 
-        year_two_digits = year_string[-2:]
-        directory='/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/data_with_comtrs'
+        # year_string = str(year) 
+        # year_two_digits = year_string[-2:]
+        # directory='/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/data_with_comtrs'
+    directory='/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/data_with_comtrs'
 
         # directory = 
-        tlb_overall_data = pd.read_csv(os.path.join(directory, str('comtrs_pur_vals_year' + year_two_digits + '.csv') ) )
+    tlb_overall_data = pd.read_csv(os.path.join(directory, str('comtrs_pur_vals_year' + year + '.csv') ) )
         # tlb_overall_data = pd.read_csv(str('comtrs_pur_vals_year' + str(year[-2:]) + '.csv') )
 
-        tlb_overall_data.acre_unit_treated = tlb_overall_data.acre_unit_treated.values / 100 # divide by 100 since original database does not include decimal point
             # year_file  = 'calPIP' + str(year) + '.csv'
-        # file_name = os.path.join('calPIP_includes_crop_areas', year_file)
-        # calPIP_data = pd.read_csv(file_name, sep = '\t')   #Pulls data from CSV file for the year
-        crop_list = np.int64(tlb_overall_data.commodity_code.unique())
         # pdb.set_trace()
-    if year > 1989:
         # pdb.set_trace()
         # print('stopped year, 1990-2016 in read_data function')
-        year_string = str(year) 
-        year_two_digits = year_string[-2:]
-        directory='/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/data_with_comtrs'
-        tlb_overall_data = pd.read_csv(os.path.join(directory, str('comtrs_pur_vals_year' + year_string + '.csv') ) )
+        # year_string = str(year) 
+        # year_two_digits = year_string[-2:]
+        # tlb_overall_data = pd.read_csv(os.path.join(directory, str('comtrs_pur_vals_year' + year_string + '.csv') ) )
+        # file_name = os.path.join('calPIP_includes_crop_areas', year_file)
+    if year < 1990:
+        # calPIP_data = pd.read_csv(file_name, sep = '\t')   #Pulls data from CSV file for the year
+        tlb_overall_data.acre_unit_treated = tlb_overall_data.acre_unit_treated.values / 100 # divide by 100 since original database does not include decimal point
+        crop_list = np.int64(tlb_overall_data.commodity_code.unique())
+
+    if year > 1989:
         crop_list = np.int64(tlb_overall_data.site_code.unique())
-        # pdb.set_trace()
+        pdb.set_trace()
     return crop_list, tlb_overall_data
 
 def make_dataframe(year, tlb_overall_data, crop_list): # Build empty dataframe for the crop acreage summations 
@@ -289,10 +350,10 @@ def calculate_acres_pre_1990(year, crop_type, crop_iter, crop_list, tlb_overall_
     if save_crop_file == 1:
         # path='/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages'
         # directory_overall_folder 
-        if os.path.isdir("/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages"):
+        if os.path.isdir("/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26"):
             print('folder does exist')
         else:
-            os.mkdir('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages')
+            os.mkdir('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26')
             print('Created calPIP_crop_acreages folder')
 
     array_zeros = np.zeros([no_COMTRS, 1])  # array of the length of COMTRS for alfalfa
@@ -344,7 +405,7 @@ def calculate_acres_pre_1990(year, crop_type, crop_iter, crop_list, tlb_overall_
             year_string = str(year) 
             year_two_digits = year_string[-2:]
             # directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages', str(year) + 'files' )
-            directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages', year_two_digits + 'files' )
+            directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26', year_two_digits + 'files' )
             # try: 
             #     crop3_df.to_csv(os.path.join(directory, (year_two_digits + 'crop' + str(crop_column) + '_by_COMTRS'+ '.csv' ) ), header = True, na_rep = '0', index = False)   
             #     # pdb.set_trace()
@@ -381,10 +442,10 @@ def calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall
     if save_crop_file == 1:
         # path='/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages'
         # directory_overall_folder 
-        if os.path.isdir("/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages"):
+        if os.path.isdir("/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26"):
             print('folder does exist')
         else:
-            os.mkdir('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages')
+            os.mkdir('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26')
             print('Created calPIP_crop_acreages folder')
 
     array_zeros = np.zeros([no_COMTRS, 1])  # array of the length of COMTRS for alfalfa
@@ -523,8 +584,8 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
     zero_fillers_normalized = np.zeros(df_shape_normalized)
     sum_crop_types_normalized = pd.DataFrame(zero_fillers_normalized, columns = [ crop_list_normalized ] )
 
-    codes_pre_1990 = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages/site_codes_with_crop_types.csv', usecols = ['site_code_pre_1990', 'site_name_pre_1990', 'is_orchard_crop_pre_1990', 'is_annual_crop_pre_1990']) # , index_col = 0)
-    codes_1990_2016 = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages/site_codes_with_crop_types.csv', usecols = ['site_code_1990_2016', 'site_name_1990_2016', 'is_orchard_crop_1990_2016', 'is_annual_crop_1990_2016']) #, index_col = 0)
+    codes_pre_1990 = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['site_code_pre_1990', 'site_name_pre_1990', 'is_orchard_crop_pre_1990', 'is_annual_crop_pre_1990']) # , index_col = 0)
+    codes_1990_2016 = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['site_code_1990_2016', 'site_name_1990_2016', 'is_orchard_crop_1990_2016', 'is_annual_crop_1990_2016']) #, index_col = 0)
     # # as shown on table 'sites_1990-2016' from PUR downloaded dataset 
 
     tree_crops_pre_1990 = codes_pre_1990.site_code_pre_1990.loc[codes_pre_1990.is_orchard_crop_pre_1990 == 1]
@@ -553,18 +614,7 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
 
     test = [tree_crops_pre_1990 + annual_crops_pre_1990]
     all_crops_pre_1990 = test[0]
-    # all_crops_pre_1990 = [str(round(i)) for i in test1]
-    # all_crops_1990_2016.reshape(1,)
 
-    # test = all_crops_1990_2016.flatten()
-    # test = np.int64(all_crops_1990_2016)
-    # all_crops_1990_2016 = test.flatten()
-    # pdb.set_trace()
-
-    ### Next steps: 
-    # for each comtrs value, find the total number of acres (sum for all crop types)
-    # multiply each value in the section by (640 / comtrs total)
-    # carry on 
 
 
     # pdb.set_trace()
@@ -622,12 +672,9 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
         acreage_of_all_annual_crops = annual_data[annual_crop_columns].sum().sum()
         acreage_of_all_crops = acreage_of_all_tree_crops + acreage_of_all_annual_crops
 
-
-        # pdb.set_trace()
-        # tlb_overall_data['comtrs'].iloc[num]
-        if year == 1994 or year == 1995:
-            print(f'the year is paused at {year}')
-            pdb.set_trace()
+        # if year == 1994 or year == 1995:
+        #     print(f'the year is paused at {year}')
+        #     pdb.set_trace()
 
         sum_crop_types.iloc[df_row]['year'] = year_date_time.year 
         sum_crop_types.iloc[df_row]['alfalfa'] = str(sum_alfalfa)
@@ -638,6 +685,10 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
         sum_crop_types.set_index('year')
         # pdb.set_trace()
 
+        ### Normalizing Next steps: 
+        # for each comtrs value, find the total number of acres (sum for all crop types)
+        # multiply each value in the section by (640 / comtrs total)
+        # carry on 
 
         if normalized == 1:
             all_crop_data = crop_data_in_irrigation_district[all_crop_columns]
@@ -681,8 +732,6 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
         else:
             sum_crop_types_normalized = 'not normalized'
 
-        # print('CHECK HERE')
-    # pdb.set_trace()
 
     sum_crop_types.to_csv(str('calPUR_data' + str(irrigation_district) + '.csv'), index = False) 
     if normalized == 1:
@@ -711,7 +760,7 @@ def county_commissioner_data(irrigation_district):
     df_kings = df_all[df_all.county=='Kings']
     df_fresno = df_all[df_all.county=='Fresno']
 
-    county_commissioner_codes = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages/county_commissioner_crop_types.csv') 
+    county_commissioner_codes = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/county_commissioner_crop_types.csv') 
     tree_crops_cc = county_commissioner_codes.site_code_cc.loc[county_commissioner_codes.is_orchard_crop == 1]
     annual_crops_cc = county_commissioner_codes.site_code_cc.loc[county_commissioner_codes.is_annual_crop == 1]
     forage_crops_cc = county_commissioner_codes.site_code_cc.loc[county_commissioner_codes.is_forage_crop == 1]
@@ -814,9 +863,16 @@ def plot_dataset_comparison(irrigation_district, tree_acreage_summed_for_year,an
 ############## end of calPIP dataset functions #################
 
 
-def plot_data_for_irrigation_district(irrigation_district, sum_crop_types):
-    x_vals = sum_crop_types.year.values
-    y_vals = sum_crop_types.all_tree_crops.values
+def plot_data_for_irrigation_district(irrigation_district, sum_crop_types, normalized):
+
+    pdb.set_trace()
+    if normalized == 0:
+        x_vals = sum_crop_types.year.values
+        y_vals = sum_crop_types.all_tree_crops.values
+    if normalized == 1:
+        x_vals = sum_crop_types.year.values
+        y_vals = sum_crop_types.all_tree_crops_normalized.values
+
     plt.plot(x_vals, y_vals)
     plt.xlabel('year')
     plt.ylabel('Acres of tree crop')
@@ -836,42 +892,53 @@ def plot_tree_crop_percentages_for_irrigation_district(irrigation_district, sum_
     plt.show()  
 
 # Step 1: Add the comtrs column (already completed for 1974 - 1989)
-# for year in range(75,90): 
-#     add_comtrs(year)  # preliminary processing of 1974 - 1989 data
+# for year in range(1974,1975): 
+#     add_comtrs_pre_1990(year)  # preliminary processing of 1974 - 1989 data
 # pdb.set_trace()
 
-# year = 1990
-# compile_data_by_comtrs(year) 
+# year = 1994
+ 
 
+#Step 2: add the comtrs columns to 1990 - 2004 data (already completed for 1990-2002)
+# for year in tqdm(range(1990,2005)):  # process post-1989 data by adding 'comtrs' row 
+#     add_comtrs_1990_2004(year)
+#     print(f'completed adding comtrs for year {year}')
+
+# Step 2, repeated for years 1994 and 1995 since the section data had some glitches
+# for year in tqdm(range(2010, 2011)):
+# add_comtrs_1990_2004(year)
+
+
+######### MUST COMPILE BY COMTRS OR THIS REALLY WONT WORK ###########
+# pdb.set_trace()
 # for year in range(1990,2017):
 #     compile_data_by_comtrs(year)  # compile 1974 - 1989 data by comtrs   - this is where it really depends how you slice it with the calculate_acreas() fuction
 #         # attempted to use this function post 1989 as well - need to fix!!!
 # pdb.set_trace()
 
-#Step 2: add the comtrs columns to 1989 - 2004 data (already completed for 1990-2002)
-# for year in tqdm(range(2000,2008)):  # process post-1989 data by adding 'comtrs' row 
-#     process_post_1989_data(year)
-#     print(f'completed adding comtrs for year {year}')
 
-# Step 2, repeated for years 1994 and 1995 since the section data had some glitches
-for year in tqdm(range(1994,1996)):
-    process_post_1989_data(year)
+# pdb.set_trace()
 
-pdb.set_trace()
 # # step 3: add the comts from 2005 - 2016 data: 
 # for year in range(2006,2017):
 #     add_comtrs_2005_2016(year)
 
+# irrigation_district = 'North Kern Water Storage District'
+# irrigation_district = 'Dudley Ridge Water District'
+# irrigation_district = 'Westlands Water District'
 
-# Step 4: save data for a specific region: 
+normalized = 1
+compare_with_cc_and_pip_data = 1 
+#Step 4: extract COMTRS values from a specific irrigation district
+
+
+# Step 5: save data for a specific region: 
 # sum_crop_types, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district('Tulare_Lake_Basin_Water_Storage_District')
 # pdb.set_trace()
 
-irrigation_district = 'Kern_County'
-normalized = 0
 # irrigation_district = 'Kings_County'
 # irrigation_district = 'Fresno_County'
-# irrigation_district = 'Tulare_County'
+irrigation_district = 'Tulare_County'
 # irrigation_district = 'North_Kern_Water_Storage_District'
 # irrigation_district = 'Cawelo_Water_District'
 # irrigation_district = 'Wasco_Irrigation_District'
@@ -884,29 +951,36 @@ sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irr
 # sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district)
 
 
-# plot_data_for_irrigation_district(irrigation_district, sum_crop_types)
+# plot_data_for_irrigation_district(irrigation_district, sum_crop_types, normalized)
 # plot_tree_crop_percentages_for_irrigation_district(irrigation_district, sum_crop_types)
-
-
-# Load County Commissioner dataset 
-sum_cc_crop_types = county_commissioner_data(irrigation_district)
-# pdb.set_trace()
 
 # Load calPUR dataset 
 if normalized == 1:
     sum_crop_types = pd.read_csv(str('calPUR_data_normalized' + str(irrigation_district) + '.csv'))
 else:
     sum_crop_types = pd.read_csv(str('calPUR_data' + str(irrigation_district) + '.csv'))
-# pdb.set_trace()
-print('go from here')
-# Load calPIP dataset 
-(all, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year, 
-    percent_tree_acreage_summed_for_year) = load_crop_type_all_year(irrigation_district)
+
+
+if compare_with_cc_and_pip_data == 1:
+    # Load County Commissioner dataset 
+    sum_cc_crop_types = county_commissioner_data(irrigation_district)
+    # pdb.set_trace()
+
+    # pdb.set_trace()
+    print('go from here')
+    # Load calPIP dataset 
+    (all, tree_acreage_summed_for_year, annual_acreage_summed_for_year, forage_acreage_summed_for_year, 
+        percent_tree_acreage_summed_for_year) = load_crop_type_all_year(irrigation_district)
+
+    # Plot combination of datasets: 
+    plot_dataset_comparison(irrigation_district, tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year, sum_crop_types, sum_cc_crop_types )
+
+if compare_with_cc_and_pip_data == 0: 
+    # pdb.set_trace()
+    plot_data_for_irrigation_district(irrigation_district, sum_crop_types, normalized)
 
 
 
-# Plot combination of datasets: 
-plot_dataset_comparison(irrigation_district, tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year, sum_crop_types, sum_cc_crop_types )
 
 
 pdb.set_trace()

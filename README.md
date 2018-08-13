@@ -1,3 +1,12 @@
+# Tulare Lake Basin's Shift from Annual to Permanent Crops 
+> Implications for Agricultural Water Shortage
+> Exploring trends from 1974 - 2016 
+
+This repository contains the code for plotting the expansion of perennial crops in the southern central valley. 
+
+## Installing / Getting started 
+
+
 ![perennial crop expansion](https://raw.githubusercontent.com/nataliemall/tulare_git_repo/master/abstract_figure_mall.png)
 
 Repository contains 

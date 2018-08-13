@@ -1,4 +1,4 @@
-![Logo of the project](/Users/nataliemall/Box Sync/abstrace_figure_mall.png)
+![Logo of the project](/Users/nataliemall/Box Sync/abstract_figure_mall.png)
 
 
 Repository contains 

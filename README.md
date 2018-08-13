@@ -1,8 +1,4 @@
-![Logo of the project](/Users/nataliemall/Box Sync/abstract_figure_mall.png)
-
-![test test](tulare_git_repo/abstract_figure_mall.png)
-
-tulare_git_repo/abstract_figure_mall.png
+![perennial crop expansion](https://raw.githubusercontent.com/nataliemall/tulare_git_repo/master/abstract_figure_mall.png)
 
 Repository contains 
 1. Groundwater data, taken from CASGEM at https://www.casgem.water.ca.gov/OSS/(S(q4ytwloehqreoahtlcw0z1ia))/Public/SearchWells.aspx and processed via the groundwater_data_compiler.py file.

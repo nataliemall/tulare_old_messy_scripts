@@ -295,7 +295,7 @@ def read_data(year):
     directory='/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/data_with_comtrs'
 
         # directory = 
-    tlb_overall_data = pd.read_csv(os.path.join(directory, str('comtrs_pur_vals_year' + year + '.csv') ) )
+    tlb_overall_data = pd.read_csv(os.path.join(directory, str('comtrs_pur_vals_year' + str(year) + '.csv') ) )
         # tlb_overall_data = pd.read_csv(str('comtrs_pur_vals_year' + str(year[-2:]) + '.csv') )
 
             # year_file  = 'calPIP' + str(year) + '.csv'
@@ -313,7 +313,7 @@ def read_data(year):
 
     if year > 1989:
         crop_list = np.int64(tlb_overall_data.site_code.unique())
-        pdb.set_trace()
+        # pdb.set_trace()
     return crop_list, tlb_overall_data
 
 def make_dataframe(year, tlb_overall_data, crop_list): # Build empty dataframe for the crop acreage summations 
@@ -520,6 +520,8 @@ def calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall
 def compile_data_by_comtrs(year): 
     '''Compiles 1974 - 1998 data by comtrs'''
     crop_list, tlb_overall_data = read_data(year)
+    # pdb.set_trace()
+    # print('check tlb_overall_data here')
     crop4_df, tulare_overall_by_crop = make_dataframe(year, tlb_overall_data, crop_list)    # make dataframe for the crop acreage summations     
     # pdb.set_trace()
     crop_iter = 0 
@@ -910,11 +912,11 @@ def plot_tree_crop_percentages_for_irrigation_district(irrigation_district, sum_
 
 
 ######### MUST COMPILE BY COMTRS OR THIS REALLY WONT WORK ###########
-# pdb.set_trace()
-# for year in range(1990,2017):
-#     compile_data_by_comtrs(year)  # compile 1974 - 1989 data by comtrs   - this is where it really depends how you slice it with the calculate_acreas() fuction
-#         # attempted to use this function post 1989 as well - need to fix!!!
-# pdb.set_trace()
+pdb.set_trace()
+for year in range(1990,2017):
+    compile_data_by_comtrs(year)  # compile 1974 - 1989 data by comtrs   - this is where it really depends how you slice it with the calculate_acreas() fuction
+        # attempted to use this function post 1989 as well - need to fix!!!
+pdb.set_trace()
 
 
 # pdb.set_trace()

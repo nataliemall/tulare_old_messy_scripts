@@ -16,13 +16,20 @@ from tqdm import tqdm  # for something in tqdm(something something):
 all_tlb_data = pd.read_csv('tlb_irrigation_districts_all.csv')
 
 test = all_tlb_data.AGENCYNAME   # Replace '/' with '-'
+agency_names = np.zeros(len(test))
+agency_names = agency_names.tolist()
 agency_names = []
 
+
+### Figure out how to remove the slashes here ###
 for num, irrigation_dist in enumerate(all_tlb_data.AGENCYNAME ):
 	pdb.set_trace()
 	test2 = irrigation_dist.replace('/','-')
 
-	agency_names[num] = test2
+	if num == 0:
+		agency_names= test2
+	else:
+		agency_names = agency_names.concat( test2 )
 # test = all_tlb_data.CO_MTRS[all_tlb_data]
 
 # all_tlb_data.columns

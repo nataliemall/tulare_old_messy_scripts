@@ -1,4 +1,5 @@
 ![Logo of the project](/Users/nataliemall/Box Sync/abstract_figure_mall.png)
+
 ![alt text](https://raw.githubusercontent.com/nataliemall/tulare_git_repo/branch/abstract_figure_mall.png)
 
 Repository contains 

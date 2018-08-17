@@ -23,17 +23,26 @@ agency_names = []
 
 ### Figure out how to remove the slashes here ###
 for num, irrigation_dist in enumerate(all_tlb_data.AGENCYNAME ):
-	pdb.set_trace()
-	test2 = irrigation_dist.replace('/','-')
 
-	if num == 0:
-		agency_names= test2
-	else:
-		agency_names = agency_names.concat( test2 )
+	if "/" in irrigation_dist:
+
+		previous = irrigation_dist 
+		test2 = irrigation_dist.replace('/','-')
+	
+		all_tlb_data.AGENCYNAME[num] = test2
+		pdb.set_trace()
+
+	# if num == 0:
+	# 	agency_names= test2
+	# else:
+	# 	pdb.set_trace()
+	# 	agency_names = pd.concat( agency_names, test2 )
 # test = all_tlb_data.CO_MTRS[all_tlb_data]
+
 
 # all_tlb_data.columns
 
+pdb.set_trace()	
 
 irrigation_districts_tlb = all_tlb_data.AGENCYNAME.unique()
 # test = irrigation_districts_tlb.tolist()

@@ -306,8 +306,9 @@ def calculate_acres_pre_1990(year, crop_type, crop_iter, crop_list, tlb_overall_
         crop_acres_list[COMTRS_iter] = total_in_COMTRS  #puts all of this crop for this comtrs in the crop_acres_list
     
     try:
-        crop2_df[lambda crop2_df: crop2_df.columns[0]] = crop_acres_list  # crop acreage list for this specific crop 
-
+        # crop2_df[lambda crop2_df: crop2_df.columns[0]] = crop_acres_list  # crop acreage list for this specific crop # risk of misassigning
+        crop_type_string = str(crop_type)
+        crop2_df[crop_type_string] = crop_acres_list   #tried this method instead so nothing gets misassigned 
         # crop_test = crop4_df.loc[crop4_df.index == '10M10S13E34']
         # pdb.set_trace()
 
@@ -398,8 +399,9 @@ def calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall
     print('This point was reached yay')
 
     try:
-        crop2_df[lambda crop2_df: crop2_df.columns[0]] = crop_acres_list  # crop acreage list for this specific crop 
-
+        # crop2_df[lambda crop2_df: crop2_df.columns[0]] = crop_acres_list  # crop acreage list for this specific crop # risk of misassignment 
+        crop_type_string = str(crop_type)
+        crop2_df[crop_type_string] = crop_acres_list   #tried this method instead so nothing gets misassigned 
         # crop_test = crop4_df.loc[crop4_df.index == '10M10S13E34']
         # pdb.set_trace()
   
@@ -427,6 +429,7 @@ def calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall
 
 def compile_data_by_comtrs(year): 
     '''Compiles 1974 - 2016 data by comtrs'''
+    print(f'Starting comtrs compilation of year {year}')
     crop_list, tlb_overall_data = read_data(year)
     # pdb.set_trace()
     # print('check tlb_overall_data here')
@@ -442,6 +445,7 @@ def compile_data_by_comtrs(year):
                 crop4_df[crop_column] = crop2_df[str(crop_column)].loc[crop2_df.index]  # Puts the individual crop acreage list into the overall dataframe crop4_df 
                 # tulare_overall_by_crop[crop_column] = crop_acres_tulare
             except:
+                crop_iter = crop_iter + 1 
                 print(f'crop2 dataframe may have been empty for this crop type number {crop_type}')
     if year > 1989:
         for crop_type in tqdm(crop_list):  # Runs for each crop type in calPIP database, then connects to larger calPIP array using COMTRS index 
@@ -455,6 +459,7 @@ def compile_data_by_comtrs(year):
                 # tulare_overall_by_crop[crop_column] = crop_acres_tulare
                 print(f'crop2 dataframe EXISTS for crop type number {crop_type}') 
             except:
+                crop_iter = crop_iter + 1 
                 print(f'crop2 dataframe may have been empty for this crop type number {crop_type}')    
     
     crop5_df = crop4_df.reset_index()
@@ -522,6 +527,7 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
     all_crops_pre_1990 = test[0]
 
     for df_row, year in tqdm(enumerate(range(1974,2017))):    # editted here to include up to 2016 
+        print(f'Compiling and normalizing the data into different crop types for year {year}')
         year_string = str(year) 
         year_two_digits = year_string[-2:]
         year_date_time = pd.to_datetime(year, format='%Y')
@@ -590,7 +596,7 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
 
         if normalized == 1:
             all_crop_data = crop_data_in_irrigation_district[all_crop_columns]
-            print('adding the graph normalizing here')
+            print('normalizing the above ammounts so that the total acreage across crop types for each comtrs is not above 640 acres')
             acreage_each_comtrs = all_crop_data.sum(axis = 1)
             all_crop_data_normalized = all_crop_data  # start normalized dataframe 
 
@@ -724,13 +730,13 @@ def plot_dataset_comparison(irrigation_district, tree_acreage_summed_for_year,an
         collection2 = collections.BrokenBarHCollection.span_where(year_list_array, ymin=0, ymax=1000000, where=(logic_rule2), facecolor='orange', alpha=0.3)
         ax.add_collection(collection2)
 
-    try:
+    try:  # works when un-normalized
         # add calPUR data: 
         x_vals = sum_crop_types.year.values
         y_vals = sum_crop_types.all_tree_crops.values
         # pdb.set_trace()
         ax.plot(x_vals, y_vals, color = 'g', label = 'calPUR tree crop acreage')
-    except: 
+    except: # occurs when data is normalized 
         x_vals = sum_crop_types.year.values
         y_vals = sum_crop_types.all_tree_crops_normalized.values
         ax.plot(x_vals, y_vals, color = 'g', label = 'calPUR tree crop acreage')
@@ -809,10 +815,10 @@ def plot_tree_crop_percentages_for_irrigation_district(irrigation_district, sum_
 #         # attempted to use this function post 1989 as well - need to fix!!!
 # pdb.set_trace()
 
-for year in tqdm(range(1974, 1990)):
-    compile_data_by_comtrs(year)
+# for year in tqdm(range(1974, 2017)):
+#     compile_data_by_comtrs(year)
 
-pdb.set_trace()
+# pdb.set_trace()
 
 # # step 3: add the comts from 2005 - 2016 data: 
 # for year in range(2006,2017):
@@ -831,17 +837,17 @@ compare_with_cc_and_pip_data = 1
 # sum_crop_types, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district('Tulare_Lake_Basin_Water_Storage_District')
 # pdb.set_trace()
 
-irrigation_district = 'Kings_County'
+# irrigation_district = 'Kings_County'
 # irrigation_district = 'Kern_County'
 
 # irrigation_district = 'Fresno_County'
-# irrigation_district = 'Tulare_County'
+irrigation_district = 'Tulare_County'
 # irrigation_district = 'North_Kern_Water_Storage_District'
 # irrigation_district = 'Cawelo_Water_District'
 # irrigation_district = 'Wasco_Irrigation_District'
 # irrigation_district = 'Buena_Vista_Water_Storage_District'
 
-
+#### Run this to re-extrace data from this specific region:  
 sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district, normalized)
 
 # irrigation_district = 'Tulare_County'
@@ -870,7 +876,12 @@ if compare_with_cc_and_pip_data == 1:
         percent_tree_acreage_summed_for_year) = load_calPIP_data_all_years(irrigation_district)
 
     # Plot combination of datasets: 
-    plot_dataset_comparison(irrigation_district, tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year, sum_crop_types, sum_cc_crop_types )
+    if normalized == 1:
+        plot_dataset_comparison(irrigation_district, tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year, sum_crop_types_normalized, sum_cc_crop_types )
+    else:    
+        plot_dataset_comparison(irrigation_district, tree_acreage_summed_for_year,annual_acreage_summed_for_year, forage_acreage_summed_for_year, sum_crop_types, sum_cc_crop_types )
+
+
 
 if compare_with_cc_and_pip_data == 0: 
     # pdb.set_trace()

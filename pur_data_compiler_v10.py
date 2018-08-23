@@ -982,25 +982,56 @@ def plot_tree_crop_percentages_for_irrigation_district(irrigation_district, sum_
     plt.show()  
 
 def plot_water_demand_graph(sum_crop_types_normalized, irrigation_district):
-        x_vals = sum_crop_types_normalized.year.values
-        y_vals = sum_crop_types_normalized.water_demand_with_2010_AW_values.values
+    x_vals = sum_crop_types_normalized.year.values
+    y_vals = sum_crop_types_normalized.water_demand_with_2010_AW_values.values
 
-        # y_vals_changing = sum_crop_types_normalized.water_demand_with_changing_AW_values.values
-        plt.xlabel('year')
-        plt.ylabel('CalPUR estimated water demand')
-        plt.title(str( 'Estimated yearly water demand for ' + str(irrigation_district) ))
-        plt.plot(x_vals, y_vals, color = 'g', label = 'calPUR crop total estimated water demand from 2010 AW value')
+    # y_vals_changing = sum_crop_types_normalized.water_demand_with_changing_AW_values.values
+    plt.xlabel('year')
+    plt.ylabel('CalPUR estimated water demand [acre-feet]')
+    plt.title(str( 'Estimated yearly water demand for ' + str(irrigation_district) ) )
+    plt.plot(x_vals, y_vals, color = 'g', label = 'calPUR crop total estimated water demand from 2010 AW value')
 
-        # pdb.set_trace()
-        x_vals_changing = x_vals[24:37]
-        y_vals_changing = sum_crop_types_normalized.water_demand_with_changing_AW_values.values[24:37]
-        plt.plot(x_vals_changing, y_vals_changing, color = 'b', label = 'calPUR crop total estimated AW from 1998 - 2010 DWR data')
-        
+    # pdb.set_trace()
+    x_vals_changing = x_vals[24:37]
+    y_vals_changing = sum_crop_types_normalized.water_demand_with_changing_AW_values.values[24:37]
+    plt.plot(x_vals_changing, y_vals_changing, color = 'b', label = 'calPUR crop total estimated AW from 1998 - 2010 DWR data')
+    
 
-        y_max = max(y_vals)
-        # pdb.set_trace()
-        plt.ylim(0 , y_max)
-        plt.show()
+    y_max = max(y_vals)
+    # pdb.set_trace()
+    plt.ylim(0 , y_max)
+    plt.legend()
+    plt.show()
+
+def plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_normalized, normalized):
+    '''Creates plot sharing x-axis (years) '''
+    # Two subplots, the axes array is 1-d
+
+    ## water demand values
+    x_vals = sum_crop_types_normalized.year.values
+    y_vals = sum_crop_types_normalized.water_demand_with_2010_AW_values.values
+
+    ## Acreage values 
+    x_acreage_vals = sum_crop_types_normalized.year.values
+    y_acreage_vals = sum_crop_types_normalized.all_tree_crops_normalized.values
+    annual_crop_y_vals = sum_crop_types_normalized.all_annual_crops.values
+
+    f, axarr = plt.subplots(2, sharex=True)
+    # plt.ylabel('Crop Acreage')
+    axarr[0].plot(x_acreage_vals, y_acreage_vals, color = 'g', label = 'cal PUR Tree crop acreage')
+    axarr[0].plot(x_acreage_vals, annual_crop_y_vals, color = 'y', label = 'calPUR annual crop acreage')
+    plt.legend(handles=[axarr[0]])
+    axarr[0].set_title(str(irrigation_district))
+    # axarr[0].xlabel('year')
+    # axarr[0].ylabel('Crop Acreage')
+    # plt.ylabel('Estimated water demand')
+    # for ax in axarr.flat:
+    #     pdb.set_trace()
+    #     ax.set(xlabel='x-label', ylabel='y-label')
+    axarr.flat[0].set(xlabel='Year', ylabel='Crop Acreage')
+    axarr.flat[1].set(xlabel='Year', ylabel='Water Demand (Acre-feet)')
+    axarr[1].plot(x_vals, y_vals, color = 'b', label = 'Estimated water demand')
+    plt.show()
 
 # # Step 1: Add the comtrs column (already completed for 1974 - 1989)
 # for year in range(1974,1990): 
@@ -1048,8 +1079,8 @@ def plot_water_demand_graph(sum_crop_types_normalized, irrigation_district):
 # irrigation_district = 'Westlands Water District'
 
 normalized = 1
-compare_with_cc_and_pip_data = 1 
-plot_water_demand = 1 
+compare_with_cc_and_pip_data = 0 
+plot_water_demand = 1
 #Step 4: extract COMTRS values from a specific irrigation district
 
 
@@ -1057,15 +1088,26 @@ plot_water_demand = 1
 # sum_crop_types, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district('Tulare_Lake_Basin_Water_Storage_District')
 # pdb.set_trace()
 
+# Counties 
 # irrigation_district = 'Kings_County'
-irrigation_district = 'Kern_County'
-
+# irrigation_district = 'Kern_County'
 # irrigation_district = 'Fresno_County'
 # irrigation_district = 'Tulare_County'
+
 # irrigation_district = 'North_Kern_Water_Storage_District'
 # irrigation_district = 'Cawelo_Water_District'
 # irrigation_district = 'Wasco_Irrigation_District'
 # irrigation_district = 'Buena_Vista_Water_Storage_District'
+
+## List of automatically produced regions  ###
+# irrigation_district = 'Tulare Irrigation District'
+# irrigation_district = 'Cawelo Water District'
+# irrigation_district = 'Lost Hills Water District'
+# irrigation_district = 'Lower Tule River Irrigation District'
+irrigation_district = 'Westlands Water District'
+# irrigation_district = 'Kern Delta Water District'
+# irrigation_district = 
+# irrigation_district = 
 
 #### Run this to re-extract data from this specific region:  
 sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district, normalized)
@@ -1081,6 +1123,8 @@ if normalized == 1:
 else:
     sum_crop_types = pd.read_csv(str('calPUR_data' + str(irrigation_district) + '.csv'))
 
+plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_normalized, normalized)
+pdb.set_trace()
 
 if compare_with_cc_and_pip_data == 1:
     # Load County Commissioner dataset 
@@ -1109,7 +1153,6 @@ if compare_with_cc_and_pip_data == 0:
         plot_data_for_irrigation_district(irrigation_district, sum_crop_types_normalized, normalized)
     if normalized == 0:
         plot_data_for_irrigation_district(irrigation_district, sum_crop_types, normalized)
-
 
 
 

@@ -516,7 +516,7 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
     sum_crop_types = pd.DataFrame(zero_fillers, columns = [ crop_list ] )
 
     # crop_list = ['year', 'alfalfa', 'almonds', 'cotton', 'all_tree_crops', 'all_annual_crops', 'all_crops', 'percent_tree_crops' ]
-    crop_list_normalized = [ 'year', 'all_tree_crops_normalized', 'all_annual_crops', 'all_crops', 'percent_tree_crops', 'water_demand_with_2010_AW_values', 'water_demand_with_changing_AW_values']
+    crop_list_normalized = [ 'year', 'all_tree_crops_normalized', 'all_annual_crops', 'all_crops', 'percent_tree_crops', 'water_demand_with_2010_AW_values', 'water_demand_with_changing_AW_values', 'minimum_water_demand_for_year']
     df_shape_normalized = (len(range(1974,2017)), len(crop_list_normalized))
     zero_fillers_normalized = np.zeros(df_shape_normalized)
     sum_crop_types_normalized = pd.DataFrame(zero_fillers_normalized, columns = [ crop_list_normalized ] )
@@ -526,6 +526,7 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
     codes_pre_1990 = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['site_code_pre_1990', 'site_name_pre_1990', 'is_orchard_crop_pre_1990', 'is_annual_crop_pre_1990', 'is_forage_pre_1990', 'applied_water_category_pre_1990']) # , index_col = 0)
     codes_1990_2016 = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['site_code_1990_2016', 'site_name_1990_2016', 'is_orchard_crop_1990_2016', 'is_annual_crop_1990_2016', 'is_forage_1990_2016', 'applied_water_category_1990_2016']) #, index_col = 0)
     HR_2010_AW_Data = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['crop_name_HR_2010', 'AW_HR_2010'])
+    HR_min_data = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['crop_name_HR_2010', 'AW_HR_2010_min'])
     # # as shown on table 'sites_1990-2016' from PUR downloaded dataset 
 
     # pdb.set_trace()
@@ -747,6 +748,10 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
             HR_2010_AW_Data_snipped = HR_2010_AW_Data.head(23)
             HR_2010_AW_Data_snipped2 = HR_2010_AW_Data_snipped.set_index('crop_name_HR_2010')
 
+            min_data_snipped = HR_min_data.head(23)
+            min_data_snipped2 = min_data_snipped.set_index('crop_name_HR_2010')
+
+            # pdb.set_trace()
             # if year < 1990:
             # if year > 1989: 
             # acreage_by_crop_type4['AW_acre_feet'] = HR_2010_AW_Data_snipped2['AW_HR_2010'].loc[HR_2010_AW_Data_snipped2.index]
@@ -757,9 +762,9 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
             acreage_by_crop_type4['applied_water_for_this_crop_type'] = np.zeros(len(acreage_by_crop_type4.acreage_within_region))
             acreage_by_crop_type4['applied_water_per_acre_by_dwr_year'] = np.zeros(len(acreage_by_crop_type4.acreage_within_region))
             acreage_by_crop_type4['applied_water_for_this_crop_type_by_dwr_year'] = np.zeros(len(acreage_by_crop_type4.acreage_within_region))
-
+            acreage_by_crop_type4['minimum_applied_water_per_acre'] = np.zeros(len(acreage_by_crop_type4.acreage_within_region))
             # pdb.set_trace()
-            if (year > 1997) & (year < 2011):
+            if (year > 1997) & (year < 2011):  # uses changing applied water values 
                 # pdb.set_trace()
                 column_name = str('AW_HR_' + str(year))
                 HR_yearly_AW_Data = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['crop_name_HR_2010', column_name])
@@ -781,25 +786,50 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
             else:
                 total_water_demand_for_year_changing_AW = 0 
             
-
+            # pdb.set_trace()
 
             # for each row in the dataset acreage_by_crop_type4, 
             # pdb.set_trace()
-            for num, row in enumerate(tqdm(acreage_by_crop_type4.AW_group2)): 
+            for num, row in enumerate(tqdm(acreage_by_crop_type4.AW_group2)):   # uses 2010 water use data from DWR 
                 # pdb.set_trace()
                 # aw_group_string = acreage_by_crop_type4.AW_group2.iloc[row]
+                test = str(acreage_by_crop_type4.index[num])
+                
+                if (year < 1990) & (str(acreage_by_crop_type4.index[num]) in tree_crops_pre_1990):
+                    try:
+                        minumum_water_demand_for_crop = min_data_snipped2.AW_HR_2010_min.loc[row]
+                        # pdb.set_trace()
+                    except:
+                        minumum_water_demand_for_crop = 0 
+                        pdb.set_trace()
+                elif (year > 1989) & (str(acreage_by_crop_type4.index[num]) in tree_crops_1990_2016):
+                    try:
+                        minumum_water_demand_for_crop = min_data_snipped2.AW_HR_2010_min.loc[row]
+                    except: 
+                        pdb.set_trace()
+                        minumum_water_demand_for_crop = 0 
+                else:
+                    # pdb.set_trace()
+                    minumum_water_demand_for_crop = 0 
+
+
                 try:
                     applied_water_numerical_value = HR_2010_AW_Data_snipped2.AW_HR_2010.loc[row]
                 except:
                     applied_water_numerical_value = 0 
+
                 acreage_by_crop_type4['applied_water_per_acre'].iloc[num] = applied_water_numerical_value
+                acreage_by_crop_type4['minimum_applied_water_per_acre'].iloc[num] = minumum_water_demand_for_crop
 
 
             # pdb.set_trace()
             acreage_by_crop_type4['applied_water_for_this_crop_type'] = acreage_by_crop_type4.acreage_within_region * np.float64(acreage_by_crop_type4.applied_water_per_acre)
+            acreage_by_crop_type4['minimum_water_for_this_crop_type'] = acreage_by_crop_type4.acreage_within_region * np.float64(acreage_by_crop_type4.minimum_applied_water_per_acre)
 
             total_water_demand_for_year = acreage_by_crop_type4.applied_water_for_this_crop_type.sum()
-
+            minumum_water_demand_for_year = acreage_by_crop_type4.minimum_water_for_this_crop_type.sum()
+            ## include minumum demand for year here
+            # minumum_water_demand_for_year = acreage_by_crop_type4
 
             acreage_of_all_tree_crops_normalized = tree_data_normalized[tree_crop_columns].sum().sum()
             acreage_of_all_annual_crops_normalized = annual_data_normalized[annual_crop_columns].sum().sum()
@@ -814,7 +844,10 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
             sum_crop_types_normalized.iloc[df_row]['percent_tree_crops'] = str(acreage_of_all_tree_crops_normalized / acreage_of_all_crops_normalized * 100)
             sum_crop_types_normalized.iloc[df_row]['water_demand_with_2010_AW_values'] = total_water_demand_for_year
             sum_crop_types_normalized.iloc[df_row]['water_demand_with_changing_AW_values'] = total_water_demand_for_year_changing_AW
+            # Add column for minimum values here 
+            sum_crop_types_normalized.iloc[df_row]['minimum_water_demand_for_year'] = minumum_water_demand_for_year
             sum_crop_types_normalized.set_index('year')
+            # pdb.set_trace()
 
             # pdb.set_trace()
             print('check that stuff is added here')
@@ -991,11 +1024,15 @@ def plot_water_demand_graph(sum_crop_types_normalized, irrigation_district):
     plt.title(str( 'Estimated yearly water demand for ' + str(irrigation_district) ) )
     plt.plot(x_vals, y_vals, color = 'g', label = 'calPUR crop total estimated water demand from 2010 AW value')
 
-    # pdb.set_trace()
-    x_vals_changing = x_vals[24:37]
-    y_vals_changing = sum_crop_types_normalized.water_demand_with_changing_AW_values.values[24:37]
-    plt.plot(x_vals_changing, y_vals_changing, color = 'b', label = 'calPUR crop total estimated AW from 1998 - 2010 DWR data')
+    # # pdb.set_trace()
+    # x_vals_changing = x_vals[24:37]
+    # y_vals_changing = sum_crop_types_normalized.water_demand_with_changing_AW_values.values[24:37]
+    # plt.plot(x_vals_changing, y_vals_changing, color = 'b', label = 'calPUR crop total estimated AW from 1998 - 2010 DWR data')
     
+    x_vals_min = sum_crop_types_normalized.year.values
+    y_vals_min = sum_crop_types_normalized.minimum_water_demand_for_year.values
+    plt.plot(x_vals_min, y_vals_min, color = 'r', label = 'minimum required applied water for permanent crop survival')
+
 
     y_max = max(y_vals)
     # pdb.set_trace()
@@ -1102,12 +1139,17 @@ plot_water_demand = 1
 ## List of automatically produced regions  ###
 # irrigation_district = 'Tulare Irrigation District'
 # irrigation_district = 'Cawelo Water District'
-# irrigation_district = 'Lost Hills Water District'
+irrigation_district = 'Lost Hills Water District'
 # irrigation_district = 'Lower Tule River Irrigation District'
-irrigation_district = 'Westlands Water District'
+# irrigation_district = 'Westlands Water District'
 # irrigation_district = 'Kern Delta Water District'
-# irrigation_district = 
-# irrigation_district = 
+# irrigation_district = 'Tulare Lake Basin Water Storage District'   # this one must have some bugs 
+# irrigation_district = 'Delano - Earlimart Irrigation District'
+# irrigation_district = 'Wheeler Ridge - Maricopa Water Storage District'
+# irrigation_district = 'Semitropic Water Service District'
+# irrigation_district = 'Arvin - Edison Water Storage District'
+# irrigation_district = 'Shafter - Wasco Irrigation District'
+# irrigation_district = 'Southern San Joaquin Municipal Utility District'
 
 #### Run this to re-extract data from this specific region:  
 sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district, normalized)

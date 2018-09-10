@@ -986,9 +986,41 @@ def plot_dataset_comparison(irrigation_district, tree_acreage_summed_for_year,an
 ############## end of calPIP dataset functions #################
 
 
-def plot_data_for_irrigation_district(irrigation_district, sum_crop_types, normalized):
+####### Bar chart creation #########
+def surface_water_bar_plot(irrigation_district, sum_crop_types_normalized):
+    pdb.set_trace()
+    sum_crop_types_normalized.year = np.int64(sum_crop_types_normalized.year)
+    sum_crop_types_normalized2 = sum_crop_types_normalized.set_index('year')
+    data_2010 = sum_crop_types_normalized2.loc[2010]
+
+    y_min_water_demand = data_2010.minimum_water_demand_for_year
+    x_normal_water_demand = data_2010.water_demand_with_2010_AW_values
+    plt.hlines(y_min_water_demand, -1, 2, colors = 'k')
+
+    wet_year_surface_water = 70000
+    wet_year_gw = 30000
+    dry_year_surface_water = 40000
+    dry_year_gw = 50000
+
+    x_labels = ['wet year', 'dry year']
+    surface_levels = [wet_year_surface_water, dry_year_surface_water]
+    gw_levels = [wet_year_gw, dry_year_gw]
+
+    x_pos = [i for i, _ in enumerate(x_labels)]
+
+    plt.bar(x_pos, gw_levels,  width = 0.8, label = 'Estimated grounwater use', color = 'brown', bottom = surface_levels)
+    plt.bar(x_pos, surface_levels, width = 0.8, label = 'Surface water use', color='b')
+    plt.legend(loc = "upper right")
+
+    plt.xticks(x_pos, x_labels)
+    plt.title("Sample Water Portfolio Changes")
+    plt.show()
 
     pdb.set_trace()
+
+def plot_data_for_irrigation_district(irrigation_district, sum_crop_types, normalized):
+
+    # pdb.set_trace()
     if normalized == 0:
         x_vals = sum_crop_types.year.values
         y_vals = sum_crop_types.all_tree_crops.values
@@ -1117,7 +1149,8 @@ def plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_nor
 
 normalized = 1
 compare_with_cc_and_pip_data = 0 
-plot_water_demand = 1
+plot_water_demand = 0
+create_bar_chart = 1 
 #Step 4: extract COMTRS values from a specific irrigation district
 
 
@@ -1138,8 +1171,8 @@ plot_water_demand = 1
 
 ## List of automatically produced regions  ###
 # irrigation_district = 'Tulare Irrigation District'
-# irrigation_district = 'Cawelo Water District'
-irrigation_district = 'Lost Hills Water District'
+irrigation_district = 'Cawelo Water District'
+# irrigation_district = 'Lost Hills Water District'
 # irrigation_district = 'Lower Tule River Irrigation District'
 # irrigation_district = 'Westlands Water District'
 # irrigation_district = 'Kern Delta Water District'
@@ -1152,7 +1185,7 @@ irrigation_district = 'Lost Hills Water District'
 # irrigation_district = 'Southern San Joaquin Municipal Utility District'
 
 #### Run this to re-extract data from this specific region:  
-sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district, normalized)
+# sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district, normalized)
 
 
 # pdb.set_trace()
@@ -1166,7 +1199,7 @@ else:
     sum_crop_types = pd.read_csv(str('calPUR_data' + str(irrigation_district) + '.csv'))
 
 plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_normalized, normalized)
-pdb.set_trace()
+# pdb.set_trace()
 
 if compare_with_cc_and_pip_data == 1:
     # Load County Commissioner dataset 
@@ -1196,7 +1229,8 @@ if compare_with_cc_and_pip_data == 0:
     if normalized == 0:
         plot_data_for_irrigation_district(irrigation_district, sum_crop_types, normalized)
 
-
+if create_bar_chart == 1:
+    surface_water_bar_plot(irrigation_district, sum_crop_types_normalized)
 
 
 pdb.set_trace()

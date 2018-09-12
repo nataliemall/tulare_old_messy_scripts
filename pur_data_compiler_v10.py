@@ -858,10 +858,10 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
         # if year == 1980: 
         #     pdb.set_trace()
 
-
-    sum_crop_types.to_csv(str('calPUR_data' + str(irrigation_district) + '.csv'), index = False) 
     if normalized == 1:
         sum_crop_types_normalized.to_csv(str('calPUR_data_normalized' + str(irrigation_district) + '.csv'), index = False) 
+    if normalized == 0:
+        sum_crop_types.to_csv(str('calPUR_data' + str(irrigation_district) + '.csv'), index = False) 
 
     # pdb.set_trace()
     return sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district
@@ -988,35 +988,82 @@ def plot_dataset_comparison(irrigation_district, tree_acreage_summed_for_year,an
 
 ####### Bar chart creation #########
 def surface_water_bar_plot(irrigation_district, sum_crop_types_normalized):
-    pdb.set_trace()
+    # pdb.set_trace()
+    plt.cla()  #clears the axes for each new graph
     sum_crop_types_normalized.year = np.int64(sum_crop_types_normalized.year)
     sum_crop_types_normalized2 = sum_crop_types_normalized.set_index('year')
     data_2010 = sum_crop_types_normalized2.loc[2010]
 
     y_min_water_demand = data_2010.minimum_water_demand_for_year
-    x_normal_water_demand = data_2010.water_demand_with_2010_AW_values
-    plt.hlines(y_min_water_demand, -1, 2, colors = 'k')
+    y_normal_water_demand = data_2010.water_demand_with_2010_AW_values
+    plt.hlines(y_normal_water_demand, -1, 2, colors = '#6baed6', label = 'estimated annual water demand')
+    plt.hlines(y_min_water_demand, -1, 2, colors = '#08519c', label = 'minimum water demand')
 
-    wet_year_surface_water = 70000
-    wet_year_gw = 30000
-    dry_year_surface_water = 40000
-    dry_year_gw = 50000
+    water_portfolios = pd.read_csv('irrigation_district_water_portfolios.csv', index_col = 'irrigation district')  # 2009 is a normal year 
+    wet_year_surface_water = water_portfolios.wet_year_surface_water[irrigation_district]
+    wet_year_gw = water_portfolios.wet_year_gw[irrigation_district]
+    dry_year_surface_water = water_portfolios.dry_year_surface_water[irrigation_district]
+    dry_year_gw = water_portfolios.dry_year_gw[irrigation_district]
 
     x_labels = ['wet year', 'dry year']
     surface_levels = [wet_year_surface_water, dry_year_surface_water]
     gw_levels = [wet_year_gw, dry_year_gw]
 
     x_pos = [i for i, _ in enumerate(x_labels)]
+    # pdb.set_trace()
 
-    plt.bar(x_pos, gw_levels,  width = 0.8, label = 'Estimated grounwater use', color = 'brown', bottom = surface_levels)
-    plt.bar(x_pos, surface_levels, width = 0.8, label = 'Surface water use', color='b')
+    plt.bar(x_pos, gw_levels,  width = 0.5, label = 'Estimated groundwater use', color = '#74c476', bottom = surface_levels)
+    plt.bar(x_pos, surface_levels, width = 0.5, label = 'Surface water use', color='#1d91c0')
     plt.legend(loc = "upper right")
 
     plt.xticks(x_pos, x_labels)
-    plt.title("Sample Water Portfolio Changes")
-    plt.show()
+    plt.title(str('Sample Water Portfolio Changes for ' + str(irrigation_district)))
+    plt.ylabel('Annual water volume [acre-feet]')
+    # plt.show()
+    plt.savefig(str(str(irrigation_district) + ' bar graph'), dpi = 300)
+    # pdb.set_trace()
 
+def gw_crop_type_comparison_plot():
+    irrigation_district_list = ['Tulare Irrigation District', 'Cawelo Water District',  'North Kern Water Storage District', 'Lost Hills Water District', 'Lower Tule River Irrigation District', 'Westlands Water District', 'Kern Delta Water District', 'Tulare Lake Basin Water Storage District', 'Delano - Earlimart Irrigation District', 'Wheeler Ridge - Maricopa Water Storage District', 'Semitropic Water Service District', 'Arvin - Edison Water Storage District', 'Shafter - Wasco Irrigation District' ]
+    # pdb.set_trace()
+    zero_fillers = np.zeros((len(irrigation_district_list),3))
+
+    district_matrix = pd.DataFrame(zero_fillers, columns = [ 'irrigation_district_name', 'perennial_annual_ratio', 'gw_surface_ratio'  ] )
+    for num, irrigation_district in enumerate(irrigation_district_list):
+        water_portfolios = pd.read_csv('irrigation_district_water_portfolios.csv', index_col = 'irrigation district')
+        sum_crop_types_normalized = pd.read_csv(str('calPUR_data_normalized' + str(irrigation_district) + '.csv'), index_col = 'year')
+        sum_crop_types_normalized.index = sum_crop_types_normalized.index.astype(int) # convert index years to integers
+
+        perennial_annual_ratio = sum_crop_types_normalized.percent_tree_crops
+        dry_year_surface_water = water_portfolios.dry_year_surface_water[irrigation_district]
+        dry_year_gw = water_portfolios.dry_year_gw[irrigation_district]
+        gw_surface_ratio = dry_year_gw / dry_year_surface_water  # ratio during dry years 
+        # pdb.set_trace()
+        district_matrix.irrigation_district_name[num] = irrigation_district
+        district_matrix.perennial_annual_ratio[num] = perennial_annual_ratio[2016]
+        district_matrix.gw_surface_ratio[num] = gw_surface_ratio
+
+    fig, ax = plt.subplots()
+    ax.scatter(district_matrix.perennial_annual_ratio, district_matrix.gw_surface_ratio )
+    plt.hlines(1, 0, 100, colors = '#6baed6', label = 'test')
+    plt.vlines(50, 0, 3.5, colors = '#08519c', label = 'test vline')
+    plt.xlabel('Percentage of perennial crops in irrigation district')
+    plt.ylabel('Ground water to surface water usage ration within the irrigation district')
     pdb.set_trace()
+    nn = irrigation_district_list
+
+    for i, txt in enumerate(nn):
+        text_x_coord = district_matrix.perennial_annual_ratio[i] - 3
+        text_y_coord = district_matrix.gw_surface_ratio[i] + 0.1
+        ax.annotate(txt, (district_matrix.perennial_annual_ratio[i], district_matrix.gw_surface_ratio[i] ), xycoords='data',
+                  xytext=(text_x_coord, text_y_coord), textcoords='data',
+                  size=10, va="center", ha="center",
+                   ) # bbox=dict(boxstyle="round4", fc="w"),
+        # pdb.set_trace()
+
+    plt.show()
+    pdb.set_trace()
+
 
 def plot_data_for_irrigation_district(irrigation_district, sum_crop_types, normalized):
 
@@ -1102,6 +1149,15 @@ def plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_nor
     axarr[1].plot(x_vals, y_vals, color = 'b', label = 'Estimated water demand')
     plt.show()
 
+def plot_all_the_irrigation_district_bar_charts():
+    ## run a loop 
+    irrigation_district_list = [ 'Lower Tule River Irrigation District', 'Westlands Water District', 'Kern Delta Water District', 'Tulare Lake Basin Water Storage District', 'Delano - Earlimart Irrigation District', 'Wheeler Ridge - Maricopa Water Storage District', 'Semitropic Water Service District', 'Arvin - Edison Water Storage District', 'Shafter - Wasco Irrigation District' ]
+    # not included in list: 'Tulare Irrigation District', 'Cawelo Water District',  'North Kern Water Storage District', 'Lost Hills Water District'
+    for irrigation_district in irrigation_district_list:
+        sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district, normalized)
+        sum_crop_types_normalized = pd.read_csv(str('calPUR_data_normalized' + str(irrigation_district) + '.csv'))
+        surface_water_bar_plot(irrigation_district, sum_crop_types_normalized)
+
 # # Step 1: Add the comtrs column (already completed for 1974 - 1989)
 # for year in range(1974,1990): 
 #     add_comtrs_pre_1990(year)  # preliminary processing of 1974 - 1989 data
@@ -1150,7 +1206,7 @@ def plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_nor
 normalized = 1
 compare_with_cc_and_pip_data = 0 
 plot_water_demand = 0
-create_bar_chart = 1 
+create_bar_chart = 0 
 #Step 4: extract COMTRS values from a specific irrigation district
 
 
@@ -1170,8 +1226,11 @@ create_bar_chart = 1
 # irrigation_district = 'Buena_Vista_Water_Storage_District'
 
 ## List of automatically produced regions  ###
+
 # irrigation_district = 'Tulare Irrigation District'
 irrigation_district = 'Cawelo Water District'
+# irrigation_district = 'North Kern Water Storage District'
+
 # irrigation_district = 'Lost Hills Water District'
 # irrigation_district = 'Lower Tule River Irrigation District'
 # irrigation_district = 'Westlands Water District'
@@ -1182,7 +1241,7 @@ irrigation_district = 'Cawelo Water District'
 # irrigation_district = 'Semitropic Water Service District'
 # irrigation_district = 'Arvin - Edison Water Storage District'
 # irrigation_district = 'Shafter - Wasco Irrigation District'
-# irrigation_district = 'Southern San Joaquin Municipal Utility District'
+# irrigation_district = 'Southern San Joaquin Municipal Utility District'  # not in TLB 
 
 #### Run this to re-extract data from this specific region:  
 # sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district, normalized)
@@ -1191,6 +1250,7 @@ irrigation_district = 'Cawelo Water District'
 # pdb.set_trace()
 # plot_data_for_irrigation_district(irrigation_district, sum_crop_types, normalized)
 # plot_tree_crop_percentages_for_irrigation_district(irrigation_district, sum_crop_types)
+
 
 # Load calPUR dataset 
 if normalized == 1:
@@ -1231,6 +1291,12 @@ if compare_with_cc_and_pip_data == 0:
 
 if create_bar_chart == 1:
     surface_water_bar_plot(irrigation_district, sum_crop_types_normalized)
+
+gw_crop_type_comparison_plot()
+
+pdb.set_trace()
+
+plot_all_the_irrigation_district_bar_charts()  # plots the water portfolio bar chart for each irrigation district 
 
 
 pdb.set_trace()

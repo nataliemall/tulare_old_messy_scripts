@@ -54,7 +54,7 @@ for irrigation_dist in irrigation_districts_tlb:   # 342 unique regions
 
 	if irrigation_dist == 'North Kern Water Storage District':
 		pdb.set_trace()
-		manual_test = pd.read_csv('North_Kern_Water_Storage_District.csv')
+		# manual_test = pd.read_csv('North_Kern_Water_Storage_District.csv')
 
 
 	comtrs = all_tlb_data.CO_MTRS[all_tlb_data.AGENCYNAME == irrigation_dist]

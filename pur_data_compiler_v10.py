@@ -16,7 +16,7 @@ def add_comtrs_pre_1990(year): #adds the comtrs as a column # preliminary proces
     final_two_digits = str(year)
     final_two_digits = final_two_digits[-2:]
 
-    overall_data = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(final_two_digits) + '.txt'), sep = '\t')
+    overall_data = pd.read_csv(str('pur_data_raw/pur' + str(final_two_digits) + '.txt'), sep = '\t')
     # pdb.set_trace()
     # tlb_overall_data = overall_data[overall_data.county_cd == 54] 16 15 10
 
@@ -86,10 +86,10 @@ def add_comtrs_1990_2004(year): #adds the comtrs as a column # preliminary proce
     final_two_digits = final_two_digits[-2:]
     # pdb.set_trace()
     # Extract data from counties 10, 15, 16, 54
-    overall_data_fresno = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_10_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
-    overall_data_kern = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_15_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
-    overall_data_kings = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_16_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
-    overall_data_tulare = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_54_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_fresno = pd.read_csv(str('pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_10_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_kern = pd.read_csv(str('pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_15_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_kings = pd.read_csv(str('pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_16_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_tulare = pd.read_csv(str('pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_54_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
 
     full_dataset = [overall_data_fresno, overall_data_kern, overall_data_kings, overall_data_tulare]
 
@@ -205,10 +205,10 @@ def add_comtrs_2005_2016(year): #adds the comtrs as a column # preliminary proce
     final_two_digits = final_two_digits[-2:]
     # pdb.set_trace()
     # Extract data from counties 10, 15, 16, 54
-    overall_data_fresno = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_10_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
-    overall_data_kern = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_15_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
-    overall_data_kings = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_16_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
-    overall_data_tulare = pd.read_csv(str('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_54_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_fresno = pd.read_csv(str('pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_10_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_kern = pd.read_csv(str('pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_15_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_kings = pd.read_csv(str('pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_16_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
+    overall_data_tulare = pd.read_csv(str('pur_data_raw/pur' + str(year) +'/udc' + final_two_digits + '_54_fixed.txt'), sep = ',', error_bad_lines = False, warn_bad_lines = True)
 
     full_dataset = [overall_data_fresno, overall_data_kern, overall_data_kings, overall_data_tulare]
 
@@ -223,7 +223,7 @@ def add_comtrs_2005_2016(year): #adds the comtrs as a column # preliminary proce
 
 def read_data(year):
 
-    directory='/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/data_with_comtrs'
+    directory='pur_data_raw/data_with_comtrs'
     tlb_overall_data = pd.read_csv(os.path.join(directory, str('comtrs_pur_vals_year' + str(year) + '.csv') ) )
 
     if year < 1990:
@@ -269,10 +269,10 @@ def calculate_acres_pre_1990(year, crop_type, crop_iter, crop_list, tlb_overall_
     if save_crop_file == 1:
         # path='/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages'
         # directory_overall_folder 
-        if os.path.isdir("/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26"):
+        if os.path.isdir("calPIP_PUR_crop_acreages_july26"):
             print('folder does exist')
         else:
-            os.mkdir('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26')
+            os.mkdir('calPIP_PUR_crop_acreages_july26')
             print('Created calPIP_crop_acreages folder')
 
     array_zeros = np.zeros([no_COMTRS, 1])  # array of the length of COMTRS for alfalfa
@@ -341,7 +341,7 @@ def calculate_acres_pre_1990(year, crop_type, crop_iter, crop_list, tlb_overall_
             year_string = str(year) 
             year_two_digits = year_string[-2:]
             # directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages', str(year) + 'files' )
-            directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26', year_two_digits + 'files' )
+            directory=os.path.join('calPIP_PUR_crop_acreages_july26', year_two_digits + 'files' )
             # try: 
             #     crop3_df.to_csv(os.path.join(directory, (year_two_digits + 'crop' + str(crop_column) + '_by_COMTRS'+ '.csv' ) ), header = True, na_rep = '0', index = False)   
             #     # pdb.set_trace()
@@ -381,10 +381,10 @@ def calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall
     if save_crop_file == 1:
         # path='/Users/nataliemall/Box Sync/herman_research_box/calPIP_crop_acreages'
         # directory_overall_folder 
-        if os.path.isdir("/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26"):
+        if os.path.isdir("calPIP_PUR_crop_acreages_july26"):
             print('folder does exist')
         else:
-            os.mkdir('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26')
+            os.mkdir('calPIP_PUR_crop_acreages_july26')
             print('Created calPIP_crop_acreages folder')
 
     array_zeros = np.zeros([no_COMTRS, 1])  # array of the length of COMTRS for alfalfa
@@ -491,7 +491,7 @@ def compile_data_by_comtrs(year):
     crop5_df = crop4_df.reset_index()
     year_string = str(year) 
     year_two_digits = year_string[-2:]
-    directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26', year_two_digits + 'files' )
+    directory=os.path.join('calPIP_PUR_crop_acreages_july26', year_two_digits + 'files' )
     try:
         crop5_df.to_csv(os.path.join(directory, ('all_data_year' + year_two_digits + '_by_COMTRS' + '.csv' ) ), header = True, na_rep = '0', index = False, sep = '\t')
     except:
@@ -504,7 +504,7 @@ def compile_data_by_comtrs(year):
 
 def retrieve_data_for_irrigation_district(irrigation_district, normalized):
 
-    irrigation_district_data = os.path.join('~/Box Sync/herman_research_box/tulare_git_repo/irrigation_districts_with_comtrs', irrigation_district + '.csv')
+    irrigation_district_data = os.path.join('irrigation_districts_with_comtrs', irrigation_district + '.csv')
     try:
         comtrs_in_irrigation_dist = pd.read_csv(irrigation_district_data, usecols = ['co_mtrs'])
     except:
@@ -523,10 +523,10 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
 
     # pdb.set_trace()
 
-    codes_pre_1990 = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['site_code_pre_1990', 'site_name_pre_1990', 'is_orchard_crop_pre_1990', 'is_annual_crop_pre_1990', 'is_forage_pre_1990', 'applied_water_category_pre_1990']) # , index_col = 0)
-    codes_1990_2016 = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['site_code_1990_2016', 'site_name_1990_2016', 'is_orchard_crop_1990_2016', 'is_annual_crop_1990_2016', 'is_forage_1990_2016', 'applied_water_category_1990_2016']) #, index_col = 0)
-    HR_2010_AW_Data = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['crop_name_HR_2010', 'AW_HR_2010'])
-    HR_min_data = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['crop_name_HR_2010', 'AW_HR_2010_min'])
+    codes_pre_1990 = pd.read_csv('calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['site_code_pre_1990', 'site_name_pre_1990', 'is_orchard_crop_pre_1990', 'is_annual_crop_pre_1990', 'is_forage_pre_1990', 'applied_water_category_pre_1990']) # , index_col = 0)
+    codes_1990_2016 = pd.read_csv('calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['site_code_1990_2016', 'site_name_1990_2016', 'is_orchard_crop_1990_2016', 'is_annual_crop_1990_2016', 'is_forage_1990_2016', 'applied_water_category_1990_2016']) #, index_col = 0)
+    HR_2010_AW_Data = pd.read_csv('calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['crop_name_HR_2010', 'AW_HR_2010'])
+    HR_min_data = pd.read_csv('calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['crop_name_HR_2010', 'AW_HR_2010_min'])
     # # as shown on table 'sites_1990-2016' from PUR downloaded dataset 
 
     # pdb.set_trace()
@@ -588,7 +588,7 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
         year_string = str(year) 
         year_two_digits = year_string[-2:]
         year_date_time = pd.to_datetime(year, format='%Y')
-        directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26', year_two_digits + 'files' )
+        directory=os.path.join('calPIP_PUR_crop_acreages_july26', year_two_digits + 'files' )
 
         # directory=os.path.join('/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_data_raw/data_with_comtrs/')
         comtrs_compiled_data = pd.read_csv(os.path.join(directory, ('all_data_year' + year_two_digits + '_by_COMTRS' + '.csv' )), sep = '\t')
@@ -618,6 +618,9 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
             sum_alfalfa = sum(crop_data_in_irrigation_district['3101'])
             sum_nectarine = sum(crop_data_in_irrigation_district['2303'])
         else: # year 1990 - 2016
+            # if year == 1990:
+                # pdb.set_trace()
+                # print('test stuff out here - sept. 12, 2018')
             tree_crop_columns = crop_data_in_irrigation_district.columns[crop_data_in_irrigation_district.columns.isin(tree_crops_1990_2016)]  # Columns that are tree crops 
             print(tree_crop_columns)
             annual_crop_columns = crop_data_in_irrigation_district.columns[crop_data_in_irrigation_district.columns.isin(annual_crops_1990_2016)]  # Columns that are annual crops 
@@ -767,7 +770,7 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
             if (year > 1997) & (year < 2011):  # uses changing applied water values 
                 # pdb.set_trace()
                 column_name = str('AW_HR_' + str(year))
-                HR_yearly_AW_Data = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['crop_name_HR_2010', column_name])
+                HR_yearly_AW_Data = pd.read_csv('calPIP_PUR_crop_acreages_july26/site_codes_with_crop_types.csv', usecols = ['crop_name_HR_2010', column_name])
                 HR_yearly_AW_Data_snipped = HR_yearly_AW_Data.head(23)
                 HR_yearly_AW_Data_snipped_2 = HR_yearly_AW_Data_snipped.set_index('crop_name_HR_2010')
 
@@ -886,7 +889,7 @@ def county_commissioner_data(irrigation_district):
     df_kings = df_all[df_all.county=='Kings']
     df_fresno = df_all[df_all.county=='Fresno']
 
-    county_commissioner_codes = pd.read_csv('~/Box Sync/herman_research_box/calPIP_PUR_crop_acreages_july26/county_commissioner_crop_types.csv') 
+    county_commissioner_codes = pd.read_csv('calPIP_PUR_crop_acreages_july26/county_commissioner_crop_types.csv') 
     tree_crops_cc = county_commissioner_codes.site_code_cc.loc[county_commissioner_codes.is_orchard_crop == 1]
     annual_crops_cc = county_commissioner_codes.site_code_cc.loc[county_commissioner_codes.is_annual_crop == 1]
     forage_crops_cc = county_commissioner_codes.site_code_cc.loc[county_commissioner_codes.is_forage_crop == 1]
@@ -1016,19 +1019,19 @@ def surface_water_bar_plot(irrigation_district, sum_crop_types_normalized):
     plt.bar(x_pos, surface_levels, width = 0.5, label = 'Surface water use', color='#1d91c0')
     plt.legend(loc = "upper right")
 
-    plt.xticks(x_pos, x_labels)
+    plt.xticks(x_pos, x_labels) 
     plt.title(str('Sample Water Portfolio Changes for ' + str(irrigation_district)))
     plt.ylabel('Annual water volume [acre-feet]')
     # plt.show()
-    plt.savefig(str(str(irrigation_district) + ' bar graph'), dpi = 300)
+    plt.savefig(str('water_portfolio_figures/' + str(irrigation_district) + ' bar graph'), dpi = 300)
     # pdb.set_trace()
 
-def gw_crop_type_comparison_plot():
-    irrigation_district_list = ['Tulare Irrigation District', 'Cawelo Water District',  'North Kern Water Storage District', 'Lost Hills Water District', 'Lower Tule River Irrigation District', 'Westlands Water District', 'Kern Delta Water District', 'Tulare Lake Basin Water Storage District', 'Delano - Earlimart Irrigation District', 'Wheeler Ridge - Maricopa Water Storage District', 'Semitropic Water Service District', 'Arvin - Edison Water Storage District', 'Shafter - Wasco Irrigation District' ]
+def gw_crop_type_comparison_plot(irrigation_district_list):
+    # irrigation_district_list = ['Tulare Irrigation District', 'Cawelo Water District',  'North Kern Water Storage District', 'Lost Hills Water District', 'Lower Tule River Irrigation District', 'Westlands Water District', 'Kern Delta Water District', 'Tulare Lake Basin Water Storage District', 'Delano - Earlimart Irrigation District', 'Wheeler Ridge - Maricopa Water Storage District', 'Semitropic Water Service District', 'Arvin - Edison Water Storage District', 'Shafter - Wasco Irrigation District' ]
     # pdb.set_trace()
-    zero_fillers = np.zeros((len(irrigation_district_list),3))
+    zero_fillers = np.zeros((len(irrigation_district_list), 5))
 
-    district_matrix = pd.DataFrame(zero_fillers, columns = [ 'irrigation_district_name', 'perennial_annual_ratio', 'gw_surface_ratio'  ] )
+    district_matrix = pd.DataFrame(zero_fillers, columns = [ 'irrigation_district_name', 'irrigation_district_acronym', 'perennial_annual_ratio', 'gw_surface_percent', 'gw_surface_percent_wet'  ] )
     for num, irrigation_district in enumerate(irrigation_district_list):
         water_portfolios = pd.read_csv('irrigation_district_water_portfolios.csv', index_col = 'irrigation district')
         sum_crop_types_normalized = pd.read_csv(str('calPUR_data_normalized' + str(irrigation_district) + '.csv'), index_col = 'year')
@@ -1037,29 +1040,43 @@ def gw_crop_type_comparison_plot():
         perennial_annual_ratio = sum_crop_types_normalized.percent_tree_crops
         dry_year_surface_water = water_portfolios.dry_year_surface_water[irrigation_district]
         dry_year_gw = water_portfolios.dry_year_gw[irrigation_district]
-        gw_surface_ratio = dry_year_gw / dry_year_surface_water  # ratio during dry years 
+        wet_year_surface_water = water_portfolios.wet_year_surface_water[irrigation_district]
+        wet_year_gw = water_portfolios.wet_year_gw[irrigation_district]
+
+        gw_surface_percent = dry_year_surface_water / ( dry_year_gw + dry_year_surface_water) * 100 # surface water as a percent of total, dry year
+        gw_surface_percent_wet = wet_year_surface_water / (wet_year_gw + wet_year_surface_water) * 100 
         # pdb.set_trace()
         district_matrix.irrigation_district_name[num] = irrigation_district
+        district_matrix.irrigation_district_acronym[num] = water_portfolios.irrigation_district_acronym[irrigation_district]
         district_matrix.perennial_annual_ratio[num] = perennial_annual_ratio[2016]
-        district_matrix.gw_surface_ratio[num] = gw_surface_ratio
+        district_matrix.gw_surface_percent[num] = gw_surface_percent
+        district_matrix.gw_surface_percent_wet[num] = gw_surface_percent_wet
+
+        point_size = np.sqrt((water_portfolios.irrigated_acreage.values) )  # square root since marker size is ^2
+        # point_size
+    # pdb.set_trace()        
 
     fig, ax = plt.subplots()
-    ax.scatter(district_matrix.perennial_annual_ratio, district_matrix.gw_surface_ratio )
-    plt.hlines(1, 0, 100, colors = '#6baed6', label = 'test')
-    plt.vlines(50, 0, 3.5, colors = '#08519c', label = 'test vline')
+    ax.scatter(district_matrix.perennial_annual_ratio, district_matrix.gw_surface_percent, color = 'green', s = point_size, alpha = 0.7 )
+    plt.hlines(50, 0, 100, colors = '#6baed6', label = 'test')
+    plt.vlines(50, 0, 100, colors = '#08519c', label = 'test vline')
     plt.xlabel('Percentage of perennial crops in irrigation district')
-    plt.ylabel('Ground water to surface water usage ration within the irrigation district')
+    plt.ylabel('Surface water as a percent of total agricultural water use within the irrigation district')
+    # pdb.set_trace()
+    nn_old = irrigation_district_list
+    nn = water_portfolios.irrigation_district_acronym.tolist()
+    nn = district_matrix.irrigation_district_acronym.tolist()
     pdb.set_trace()
-    nn = irrigation_district_list
 
     for i, txt in enumerate(nn):
         text_x_coord = district_matrix.perennial_annual_ratio[i] - 3
-        text_y_coord = district_matrix.gw_surface_ratio[i] + 0.1
-        ax.annotate(txt, (district_matrix.perennial_annual_ratio[i], district_matrix.gw_surface_ratio[i] ), xycoords='data',
+        text_y_coord = district_matrix.gw_surface_percent[i] + 0.1
+        ax.annotate(txt, (district_matrix.perennial_annual_ratio[i], district_matrix.gw_surface_percent[i] ), xycoords='data',
                   xytext=(text_x_coord, text_y_coord), textcoords='data',
                   size=10, va="center", ha="center",
                    ) # bbox=dict(boxstyle="round4", fc="w"),
         # pdb.set_trace()
+    ax.scatter(district_matrix.perennial_annual_ratio, district_matrix.gw_surface_percent_wet, color = 'orange' , s = point_size, alpha = 0.7 )
 
     plt.show()
     pdb.set_trace()
@@ -1127,6 +1144,7 @@ def plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_nor
     x_vals = sum_crop_types_normalized.year.values
     y_vals = sum_crop_types_normalized.water_demand_with_2010_AW_values.values
 
+    y_vals_min = sum_crop_types_normalized.minimum_water_demand_for_year.values
     ## Acreage values 
     x_acreage_vals = sum_crop_types_normalized.year.values
     y_acreage_vals = sum_crop_types_normalized.all_tree_crops_normalized.values
@@ -1147,11 +1165,32 @@ def plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_nor
     axarr.flat[0].set(xlabel='Year', ylabel='Crop Acreage')
     axarr.flat[1].set(xlabel='Year', ylabel='Water Demand (Acre-feet)')
     axarr[1].plot(x_vals, y_vals, color = 'b', label = 'Estimated water demand')
-    plt.show()
+    axarr[1].plot(x_vals, y_vals_min, color = 'r', label = 'Estimated minimum perennial water demand')
+    # plt.savefig(irrigation_district_time_series_figures '')
+    plt.ylim(ymin = 0 )
 
-def plot_all_the_irrigation_district_bar_charts():
+    plt.savefig(str('irrigation_district_time_series_figures/' + str(irrigation_district) + ' time_series'), dpi = 300)
+    # plt.show()
+
+def plot_all_the_irrigation_district_bar_charts(irrigation_district_list):
     ## run a loop 
-    irrigation_district_list = [ 'Lower Tule River Irrigation District', 'Westlands Water District', 'Kern Delta Water District', 'Tulare Lake Basin Water Storage District', 'Delano - Earlimart Irrigation District', 'Wheeler Ridge - Maricopa Water Storage District', 'Semitropic Water Service District', 'Arvin - Edison Water Storage District', 'Shafter - Wasco Irrigation District' ]
+
+    # irrigation_district_list = [ 'Cawelo Water District',  \
+    # 'Consolidated Irrigation District', 'Corcoran Irrigation District', 'Delano - Earlimart Irrigation District', \
+    # 'Dudley Ridge Water District', 'Firebaugh Canal Company', 'Fresno Irrigation District', 'James Irrigation District', \
+    # 'Kern - Tulare Water District', 'Kern Delta Water District', 'Kings River Water District', 'Lindmore Irrigation District',\
+    # 'Lost Hills Water District', 'North Kern Water Storage District', 'Orange Cove Irrigation District',
+    # 'Panoche Water District', 'Pixley Irrigation District', 'Riverdale Irrigation District', 'Semitropic Water Service District',\
+    # 'Shafter - Wasco Irrigation District', 'Tulare Irrigation District', 'Tulare Lake Basin Water Storage District',\
+    # 'Westlands Water District', 'Wheeler Ridge - Maricopa Water Storage District']  # Lower Tule River Irrigation District
+    
+    # irrigation_district_list = [ 'Buena Vista Water Storage District' , 'Lower Tule River Irrigation District', 'Alta Irrigation District', 'Arvin - Edison Water Storage District', \
+    # 'Berrenda Mesa Water District']
+
+    # irrigation_district_list = [ 'Lower Tule River Irrigation District', 'Westlands Water District', \
+    # 'Kern Delta Water District', 'Tulare Lake Basin Water Storage District', 'Delano - Earlimart Irrigation District', \
+    # 'Wheeler Ridge - Maricopa Water Storage District', 'Semitropic Water Service District', \
+    # 'Arvin - Edison Water Storage District', 'Shafter - Wasco Irrigation District' ]
     # not included in list: 'Tulare Irrigation District', 'Cawelo Water District',  'North Kern Water Storage District', 'Lost Hills Water District'
     for irrigation_district in irrigation_district_list:
         sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district, normalized)
@@ -1204,9 +1243,10 @@ def plot_all_the_irrigation_district_bar_charts():
 # irrigation_district = 'Westlands Water District'
 
 normalized = 1
+plot_single_irrigation_district = 1 
 compare_with_cc_and_pip_data = 0 
 plot_water_demand = 0
-create_bar_chart = 0 
+create_bar_chart = 0
 #Step 4: extract COMTRS values from a specific irrigation district
 
 
@@ -1228,10 +1268,10 @@ create_bar_chart = 0
 ## List of automatically produced regions  ###
 
 # irrigation_district = 'Tulare Irrigation District'
-irrigation_district = 'Cawelo Water District'
+# irrigation_district = 'Cawelo Water District'
 # irrigation_district = 'North Kern Water Storage District'
 
-# irrigation_district = 'Lost Hills Water District'
+irrigation_district = 'Lost Hills Water District'
 # irrigation_district = 'Lower Tule River Irrigation District'
 # irrigation_district = 'Westlands Water District'
 # irrigation_district = 'Kern Delta Water District'
@@ -1252,14 +1292,58 @@ irrigation_district = 'Cawelo Water District'
 # plot_tree_crop_percentages_for_irrigation_district(irrigation_district, sum_crop_types)
 
 
-# Load calPUR dataset 
-if normalized == 1:
-    sum_crop_types_normalized = pd.read_csv(str('calPUR_data_normalized' + str(irrigation_district) + '.csv'))
-else:
-    sum_crop_types = pd.read_csv(str('calPUR_data' + str(irrigation_district) + '.csv'))
 
-plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_normalized, normalized)
-# pdb.set_trace()
+
+irrigation_district_list = [ 'Cawelo Water District', 'Buena Vista Water Storage District' , 'Berrenda Mesa Water District', \
+'Lower Tule River Irrigation District', 'Alta Irrigation District', 'Arvin - Edison Water Storage District', \
+'Consolidated Irrigation District', 'Corcoran Irrigation District', 'Delano - Earlimart Irrigation District', \
+'Dudley Ridge Water District', 'Firebaugh Canal Company', 'Fresno Irrigation District', 'James Irrigation District', \
+'Kern - Tulare Water District', 'Kern Delta Water District', 'Kings River Water District', 'Lindmore Irrigation District',\
+'Lost Hills Water District', 'North Kern Water Storage District', 'Orange Cove Irrigation District', \
+'Panoche Water District', 'Pixley Irrigation District', 'Riverdale Irrigation District', 'Semitropic Water Service District',\
+'Shafter - Wasco Irrigation District', 'Tulare Irrigation District', 'Tulare Lake Basin Water Storage District',\
+'Westlands Water District', 'Wheeler Ridge - Maricopa Water Storage District'] 
+
+irrigation_district_list = [
+    'Tulare Irrigation District',
+    'Cawelo Water District',
+    'Lost Hills Water District',
+    'Lower Tule River Irrigation District',
+    'Westlands Water District',
+    'Kern Delta Water District',
+    'Tulare Lake Basin Water Storage District',
+    'Delano - Earlimart Irrigation District',
+    'Wheeler Ridge - Maricopa Water Storage District',
+    'Semitropic Water Service District',
+    'Arvin - Edison Water Storage District',
+    'Shafter - Wasco Irrigation District',
+    'North Kern Water Storage District',
+    'Kern - Tulare Water District',
+    'Buena Vista Water Storage District',
+    'Alta Irrigation District',
+    'Berrenda Mesa Water District',
+    'Consolidated Irrigation District',
+    'Corcoran Irrigation District',
+    'Fresno Irrigation District'] 
+
+gw_crop_type_comparison_plot(irrigation_district_list)
+pdb.set_trace()
+
+###### Graph 4 ##############
+for irrigation_district in irrigation_district_list:
+    sum_crop_types_normalized = pd.read_csv(str('calPUR_data_normalized' + str(irrigation_district) + '.csv'))
+    plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_normalized, normalized)
+#####################
+
+pdb.set_trace()
+
+
+#################  Plots for single irrigation district ###################
+# Load calPUR dataset 
+if normalized == 1 and plot_single_irrigation_district == 1:
+    sum_crop_types_normalized = pd.read_csv(str('calPUR_data_normalized' + str(irrigation_district) + '.csv'))
+elif normalized == 0:
+    sum_crop_types = pd.read_csv(str('calPUR_data' + str(irrigation_district) + '.csv'))
 
 if compare_with_cc_and_pip_data == 1:
     # Load County Commissioner dataset 
@@ -1291,12 +1375,14 @@ if compare_with_cc_and_pip_data == 0:
 
 if create_bar_chart == 1:
     surface_water_bar_plot(irrigation_district, sum_crop_types_normalized)
-
-gw_crop_type_comparison_plot()
-
-pdb.set_trace()
-
-plot_all_the_irrigation_district_bar_charts()  # plots the water portfolio bar chart for each irrigation district 
+####################################################################################
 
 
 pdb.set_trace()
+
+plot_all_the_irrigation_district_bar_charts(irrigation_district_list)  # plots the water portfolio bar chart for each irrigation district 
+
+pdb.set_trace()
+
+
+

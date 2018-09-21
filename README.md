@@ -32,24 +32,28 @@ For any of the 4 counties, plots a comparison of the calPUR, calPIP, and county 
 
 
 ## Other tools:
-Processing the calPIP data (years 1990-2016 only):
+
+### Processing the calPIP data (years 1990-2016 only):
 Step 1: Download the data at https://calpip.cdpr.ca.gov/county.cfm 
-	- Select desired counties (Fresno, Kern, Kings, and Tulare required for the following scripts)
-	- Select desired year
-	- Click 'Format Output'
-	- Ensure 'AMOUNT_PLANTED', 'COUNTY_NAME', 'COMTRS', and 'SITE_NAME' are listed under 'Output Columns Selected:'
-	- Click 'Submit Query'
-	- Enter email address and click 'Send Query Now'
-	- Save as 'calPIP_includes_crop_areas/calPIP<year>.csv'  e.g. 'calPIP_includes_crop_areas/calPIP2004.csv'
-	- Repeat 35 times! Change desired year each time (1980 - 2016) 
+a. Select desired counties (Fresno, Kern, Kings, and Tulare required for the following scripts)
+b. Select desired year
+c. Click 'Format Output'
+d. Ensure 'AMOUNT_PLANTED', 'COUNTY_NAME', 'COMTRS', and 'SITE_NAME' are listed under 'Output Columns Selected:'
+e. Click 'Submit Query'
+f. Enter email address and click 'Send Query Now'
+g. Save as 'calPIP_includes_crop_areas/calPIP<year>.csv'  e.g. 'calPIP_includes_crop_areas/calPIP2004.csv'
+h. Repeat 35 times! Change desired year each time (1980 - 2016)
+
 Step 2: Run calPIP_all_crops_compiler.py
-    - function that compiles data saved in calPIP_includes_crop_areas folder
-    - sums calPIP data for all years 
-    - saves compiled output files in calPIP_crop_acreages folder 
-    - saves file (eg 2004crop_type_by_COMTRS.csv) for QGIS plotting 
-    - saves summed yearly data for tulare county as overall_results.csv 
+Description: 
+a. function that compiles data saved in calPIP_includes_crop_areas folder
+b. sums calPIP data for all years 
+c. saves compiled output files in calPIP_crop_acreages folder 
+d. saves file (eg 2004crop_type_by_COMTRS.csv) for QGIS plotting 
+e. saves summed yearly data for tulare county as overall_results.csv 
+
 Step 3: Run calPIP_all_crops_compiler.py
-    - takes overall_results.csv and plots major crop types 
+a. Takes overall_results.csv and plots major crop types 
 
 
 

@@ -249,14 +249,8 @@ def make_dataframe(year, tlb_overall_data, crop_list): # Build empty dataframe f
 
 
 def calculate_acres_pre_1990(year, crop_type, crop_iter, crop_list, tlb_overall_data): # for a given set of comtrs, calculate total tree crop acreage 
-    print('here is where there is something wrong')
+    
     crop_type_vals = tlb_overall_data.loc[lambda df: tlb_overall_data.commodity_code == crop_type, : ]  # pulls permits for each of the crop types (filters for only this crop)
-    # if crop_type == 3101:
-        # pdb.set_trace()
-    print(f'the length is {len(crop_type_vals)}')
-    # no_reg_firm_IDs = len(crop_type_vals.reg_firm_no.unique()) # number of registration firms for a specific crop 
-    ## ^ Edit location ID search - test for different SITE_LOCATION_ID
-    # number_of_null_site_location_ids = sum(pd.isnull(crop_type_vals.reg_firm_no))
 
     COMTRS_list = crop_type_vals.comtrs.unique()
     no_COMTRS = len(crop_type_vals.comtrs.unique())   # number of unique COMTRS that grow specific crop 
@@ -324,9 +318,6 @@ def calculate_acres_pre_1990(year, crop_type, crop_iter, crop_list, tlb_overall_
             crop_acres_list[COMTRS_iter] = 0 
             print('HERE IS THE ERROR')
             # pdb.set_trace()
-    # pdb.set_trace()
-    # if crop_type == 3101:
-    #     pdb.set_trace()
     try:
         # crop2_df[lambda crop2_df: crop2_df.columns[0]] = crop_acres_list  # crop acreage list for this specific crop # risk of misassigning
         crop_type_string = str(crop_type)
@@ -558,21 +549,6 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
     annual_crops_1990_2016_list = annual_crops_1990_2016.values.tolist()
     annual_crops_1990_2016 = [str(round(i)) for i in annual_crops_1990_2016_list]
 
-    # pdb.set_trace()
-    # all_crops_1990_2016 = [tree_crops_1990_2016_list, annual_crops_1990_2016_list]
-    # all_crops_1990_2016 = tree_crops_1990_2016
-    # all_crops_1990_2016.extend(annual_crops_1990_2016)
-    # all_crops_1990_2016.extend(forage_crops_1990_2016)
-
-    # all_crops_pre_1990 = str(tree_crops_pre_1990)
-    # all_crops_pre_1990.extend(annual_crops_pre_1990)
-    # all_crops_pre_1990.extend(forage_crops_pre_1990)
-    # tree_crops_1990_2016.extend(annual_crops_1990_2016)
-
-
-    # test = [tree_crops_1990_2016, annual_crops_1990_2016, forage_crops_1990_2016 ]
-
-
     concatted_1990_2016 = [tree_crops_1990_2016_list + annual_crops_1990_2016_list + forage_crops_1990_2016_list]
     concatted_1990_2016_formatted = concatted_1990_2016[0]
     all_crops_1990_2016 = [str(round(i)) for i in concatted_1990_2016_formatted]
@@ -604,9 +580,7 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
 
 
         if year < 1990:
-            # teset = str(tree_crops_pre_1990)
-            # tree_crops_pre_1990 = np.reshape(tree_crops_pre_1990, (len(tree_crops_pre_1990), 1))
-            # tree_crops_pre_1990 = tree_crops_pre_1990.tolist()
+
             tree_crop_columns = crop_data_in_irrigation_district.columns[crop_data_in_irrigation_district.columns.isin(tree_crops_pre_1990)]  # Columns that are tree crops 
             annual_crop_columns =  crop_data_in_irrigation_district.columns[crop_data_in_irrigation_district.columns.isin(annual_crops_pre_1990)]
             forage_crop_columns = crop_data_in_irrigation_district.columns[crop_data_in_irrigation_district.columns.isin(forage_crops_pre_1990)]
@@ -654,15 +628,9 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
         sum_crop_types.iloc[df_row]['percent_tree_crops'] = str(acreage_of_all_tree_crops / acreage_of_all_crops * 100)
         sum_crop_types.set_index('year')
 
-        # if year == 1980: 
-        #     pdb.set_trace()
-
-        ### Normalizing Next steps: 
-        # for each comtrs value, find the total number of acres (sum for all crop types)
-        # multiply each value in the section by (640 / comtrs total)
-        # carry on 
-
         if normalized == 1:
+            # for each comtrs value, find the total number of acres (sum for all crop types)
+            # multiply each value in the section by (640 / comtrs total)
             all_crop_data = crop_data_in_irrigation_district[all_crop_columns]
             print('normalizing the above amounts so that the total acreage across crop types for each comtrs is not above 640 acres')
             acreage_each_comtrs = all_crop_data.sum(axis = 1)
@@ -680,11 +648,6 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
                 else: 
                     number_of_skips = number_of_skips + 1 
 
-            ### Insert here: in all_crop_data_normalized: add a column for the amount of water used based on the AW_HR_2010 code (muliplied by the number of acres)
-            
-            # pdb.set_trace()
-            print('Insert here: in all_crop_data_normalized: add a column for the amount of water used based on the AW_HR_2010 code (muliplied by the number of acres)')
-            
             tree_data_normalized = all_crop_data_normalized[tree_crop_columns]
             annual_data_normalized = all_crop_data_normalized[annual_crop_columns]
             forage_data_normalized = all_crop_data_normalized[forage_crop_columns]
@@ -715,11 +678,6 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
                 # pdb.set_trace()
 
                 acreage_by_crop_type4['AW_group2'] = codes_pre_1990_2['applied_water_category_pre_1990'].loc[codes_pre_1990_2.index]
-
-                # acreage_by_crop_type4['acreage_within_region'] = acreage_by_crop_type4[0]
-                # acreage_by_crop_type4 = acreage_by_crop_type4.drop(columns = [0] )  # drop redundant column 
-
-                # acreage_by_crop_type4['AW_group2'] = codes_pre_1990_2['applied_water_category_pre_1990'].loc[codes_pre_1990_2.index]
 
             if year > 1989:  # calculate water use by multiplying the total acreage of for each crop type by its AW value
                 # pdb.set_trace()
@@ -754,9 +712,6 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
             min_data_snipped = HR_min_data.head(23)
             min_data_snipped2 = min_data_snipped.set_index('crop_name_HR_2010')
 
-            # pdb.set_trace()
-            # if year < 1990:
-            # if year > 1989: 
             # acreage_by_crop_type4['AW_acre_feet'] = HR_2010_AW_Data_snipped2['AW_HR_2010'].loc[HR_2010_AW_Data_snipped2.index]
             acreage_by_crop_type4['acreage_within_region'] = acreage_by_crop_type4[0]
             acreage_by_crop_type4 = acreage_by_crop_type4.drop(columns = [0] )  # drop redundant column 
@@ -788,11 +743,8 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
                 total_water_demand_for_year_changing_AW = acreage_by_crop_type4.applied_water_for_this_crop_type_by_dwr_year.sum()
             else:
                 total_water_demand_for_year_changing_AW = 0 
-            
-            # pdb.set_trace()
 
             # for each row in the dataset acreage_by_crop_type4, 
-            # pdb.set_trace()
             for num, row in enumerate(tqdm(acreage_by_crop_type4.AW_group2)):   # uses 2010 water use data from DWR 
                 # pdb.set_trace()
                 # aw_group_string = acreage_by_crop_type4.AW_group2.iloc[row]
@@ -857,9 +809,6 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
 
         else:
             sum_crop_types_normalized = 'not normalized'
-        # pdb.set_trace()
-        # if year == 1980: 
-        #     pdb.set_trace()
 
     if normalized == 1:
         sum_crop_types_normalized.to_csv(str('calPUR_data_normalized' + str(irrigation_district) + '.csv'), index = False) 
@@ -995,10 +944,12 @@ def surface_water_bar_plot(irrigation_district, sum_crop_types_normalized):
     plt.cla()  #clears the axes for each new graph
     sum_crop_types_normalized.year = np.int64(sum_crop_types_normalized.year)
     sum_crop_types_normalized2 = sum_crop_types_normalized.set_index('year')
-    data_2010 = sum_crop_types_normalized2.loc[2010]
+    data_2016 = sum_crop_types_normalized2.loc[2016]
 
-    y_min_water_demand = data_2010.minimum_water_demand_for_year
-    y_normal_water_demand = data_2010.water_demand_with_2010_AW_values
+    # pdb.set_trace()
+
+    y_min_water_demand = data_2016.minimum_water_demand_for_year
+    y_normal_water_demand = data_2016.water_demand_with_2010_AW_values
     plt.hlines(y_normal_water_demand, -1, 2, colors = '#6baed6', label = 'estimated annual water demand')
     plt.hlines(y_min_water_demand, -1, 2, colors = '#08519c', label = 'minimum water demand')
 
@@ -1154,7 +1105,7 @@ def plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_nor
     # plt.ylabel('Crop Acreage')
     axarr[0].plot(x_acreage_vals, y_acreage_vals, color = 'g', label = 'cal PUR Tree crop acreage')
     axarr[0].plot(x_acreage_vals, annual_crop_y_vals, color = 'y', label = 'calPUR annual crop acreage')
-    plt.legend(handles=[axarr[0]])
+    plt.legend(handles=[axarr[0]])  ## These labels don't show up 
     axarr[0].set_title(str(irrigation_district))
     # axarr[0].xlabel('year')
     # axarr[0].ylabel('Crop Acreage')
@@ -1175,25 +1126,8 @@ def plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_nor
 def plot_all_the_irrigation_district_bar_charts(irrigation_district_list):
     ## run a loop 
 
-    # irrigation_district_list = [ 'Cawelo Water District',  \
-    # 'Consolidated Irrigation District', 'Corcoran Irrigation District', 'Delano - Earlimart Irrigation District', \
-    # 'Dudley Ridge Water District', 'Firebaugh Canal Company', 'Fresno Irrigation District', 'James Irrigation District', \
-    # 'Kern - Tulare Water District', 'Kern Delta Water District', 'Kings River Water District', 'Lindmore Irrigation District',\
-    # 'Lost Hills Water District', 'North Kern Water Storage District', 'Orange Cove Irrigation District',
-    # 'Panoche Water District', 'Pixley Irrigation District', 'Riverdale Irrigation District', 'Semitropic Water Service District',\
-    # 'Shafter - Wasco Irrigation District', 'Tulare Irrigation District', 'Tulare Lake Basin Water Storage District',\
-    # 'Westlands Water District', 'Wheeler Ridge - Maricopa Water Storage District']  # Lower Tule River Irrigation District
-    
-    # irrigation_district_list = [ 'Buena Vista Water Storage District' , 'Lower Tule River Irrigation District', 'Alta Irrigation District', 'Arvin - Edison Water Storage District', \
-    # 'Berrenda Mesa Water District']
-
-    # irrigation_district_list = [ 'Lower Tule River Irrigation District', 'Westlands Water District', \
-    # 'Kern Delta Water District', 'Tulare Lake Basin Water Storage District', 'Delano - Earlimart Irrigation District', \
-    # 'Wheeler Ridge - Maricopa Water Storage District', 'Semitropic Water Service District', \
-    # 'Arvin - Edison Water Storage District', 'Shafter - Wasco Irrigation District' ]
-    # not included in list: 'Tulare Irrigation District', 'Cawelo Water District',  'North Kern Water Storage District', 'Lost Hills Water District'
     for irrigation_district in irrigation_district_list:
-        sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district, normalized)
+        # sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district, normalized)
         sum_crop_types_normalized = pd.read_csv(str('calPUR_data_normalized' + str(irrigation_district) + '.csv'))
         surface_water_bar_plot(irrigation_district, sum_crop_types_normalized)
 
@@ -1271,11 +1205,11 @@ create_bar_chart = 0
 # irrigation_district = 'Cawelo Water District'
 # irrigation_district = 'North Kern Water Storage District'
 
-irrigation_district = 'Lost Hills Water District'
+# irrigation_district = 'Lost Hills Water District'
 # irrigation_district = 'Lower Tule River Irrigation District'
 # irrigation_district = 'Westlands Water District'
 # irrigation_district = 'Kern Delta Water District'
-# irrigation_district = 'Tulare Lake Basin Water Storage District'   # this one must have some bugs 
+irrigation_district = 'Tulare Lake Basin Water Storage District'   # this one must have some bugs 
 # irrigation_district = 'Delano - Earlimart Irrigation District'
 # irrigation_district = 'Wheeler Ridge - Maricopa Water Storage District'
 # irrigation_district = 'Semitropic Water Service District'
@@ -1294,48 +1228,52 @@ irrigation_district = 'Lost Hills Water District'
 
 
 
-irrigation_district_list = [ 'Cawelo Water District', 'Buena Vista Water Storage District' , 'Berrenda Mesa Water District', \
-'Lower Tule River Irrigation District', 'Alta Irrigation District', 'Arvin - Edison Water Storage District', \
-'Consolidated Irrigation District', 'Corcoran Irrigation District', 'Delano - Earlimart Irrigation District', \
-'Dudley Ridge Water District', 'Firebaugh Canal Company', 'Fresno Irrigation District', 'James Irrigation District', \
-'Kern - Tulare Water District', 'Kern Delta Water District', 'Kings River Water District', 'Lindmore Irrigation District',\
-'Lost Hills Water District', 'North Kern Water Storage District', 'Orange Cove Irrigation District', \
-'Panoche Water District', 'Pixley Irrigation District', 'Riverdale Irrigation District', 'Semitropic Water Service District',\
-'Shafter - Wasco Irrigation District', 'Tulare Irrigation District', 'Tulare Lake Basin Water Storage District',\
-'Westlands Water District', 'Wheeler Ridge - Maricopa Water Storage District'] 
+# irrigation_district_list = [ 'Cawelo Water District', 'Buena Vista Water Storage District' , 'Berrenda Mesa Water District', \
+# 'Lower Tule River Irrigation District', 'Alta Irrigation District', 'Arvin - Edison Water Storage District', \
+# 'Consolidated Irrigation District', 'Corcoran Irrigation District', 'Delano - Earlimart Irrigation District', \
+# 'Dudley Ridge Water District', 'Firebaugh Canal Company', 'Fresno Irrigation District', 'James Irrigation District', \
+# 'Kern - Tulare Water District', 'Kern Delta Water District', 'Kings River Water District', 'Lindmore Irrigation District',\
+# 'Lost Hills Water District', 'North Kern Water Storage District', 'Orange Cove Irrigation District', \
+# 'Panoche Water District', 'Pixley Irrigation District', 'Riverdale Irrigation District', 'Semitropic Water Service District',\
+# 'Shafter - Wasco Irrigation District', 'Tulare Irrigation District', 'Tulare Lake Basin Water Storage District',\
+# 'Westlands Water District', 'Wheeler Ridge - Maricopa Water Storage District'] 
 
-irrigation_district_list = [
-    'Tulare Irrigation District',
-    'Cawelo Water District',
-    'Lost Hills Water District',
-    'Lower Tule River Irrigation District',
-    'Westlands Water District',
-    'Kern Delta Water District',
-    'Tulare Lake Basin Water Storage District',
-    'Delano - Earlimart Irrigation District',
-    'Wheeler Ridge - Maricopa Water Storage District',
-    'Semitropic Water Service District',
-    'Arvin - Edison Water Storage District',
-    'Shafter - Wasco Irrigation District',
-    'North Kern Water Storage District',
-    'Kern - Tulare Water District',
-    'Buena Vista Water Storage District',
-    'Alta Irrigation District',
-    'Berrenda Mesa Water District',
-    'Consolidated Irrigation District',
-    'Corcoran Irrigation District',
-    'Fresno Irrigation District'] 
+# irrigation_district_list = [
+#     'Tulare Irrigation District',
+#     'Cawelo Water District',
+#     'Lost Hills Water District',
+#     'Lower Tule River Irrigation District',
+#     'Westlands Water District',
+#     'Kern Delta Water District',
+#     'Tulare Lake Basin Water Storage District',
+#     'Delano - Earlimart Irrigation District',
+#     'Wheeler Ridge - Maricopa Water Storage District',
+#     'Semitropic Water Service District',
+#     'Arvin - Edison Water Storage District',
+#     'Shafter - Wasco Irrigation District',
+#     'North Kern Water Storage District',
+#     'Kern - Tulare Water District',
+#     'Buena Vista Water Storage District',
+#     'Alta Irrigation District',
+#     'Berrenda Mesa Water District',
+#     'Consolidated Irrigation District',
+#     'Corcoran Irrigation District',
+#     'Fresno Irrigation District'] 
 
-gw_crop_type_comparison_plot(irrigation_district_list)
-pdb.set_trace()
+# plot_all_the_irrigation_district_bar_charts(irrigation_district_list) # plots the water portfolio bar chart for each irrigation district 
 
-###### Graph 4 ##############
-for irrigation_district in irrigation_district_list:
-    sum_crop_types_normalized = pd.read_csv(str('calPUR_data_normalized' + str(irrigation_district) + '.csv'))
-    plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_normalized, normalized)
-#####################
+# pdb.set_trace()
 
-pdb.set_trace()
+
+# gw_crop_type_comparison_plot(irrigation_district_list)
+
+# ###### Graph 4 ##############
+# for irrigation_district in irrigation_district_list:
+#     sum_crop_types_normalized = pd.read_csv(str('calPUR_data_normalized' + str(irrigation_district) + '.csv'))
+#     plot_acreage_and_demand_side_by_side(irrigation_district, sum_crop_types_normalized, normalized)
+# #####################
+
+# pdb.set_trace()
 
 
 #################  Plots for single irrigation district ###################

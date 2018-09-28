@@ -12,27 +12,30 @@ import re
 from tqdm import tqdm  # for something in tqdm(something something):
 
 
-files = '/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/pur1990'
+# files = 'pur_pre_1990/pur1990'
 
-directory = '/Users/nataliemall/Box Sync/herman_research_box/tulare_git_repo/pur_pre_1990/'
+def replace_bad_characters():
+	directory = 'tulare_git_repo/pur_data_raw/'
+	os.mkdir('pur_data_cleaned')  #make cleaned directory 
+	new_directory = 'pur_data_cleaned'
+	# 'pur1990/'
 
-'pur1990/'
+	# 'udc90_54.txt'
 
-'udc90_54.txt'
+	file_years = np.arange(1990,2017)
+	file_numbers = [10, 15, 16, 54]  # fixes only the necessary counties (Tulare, Kern, Kings, Fresno)
 
-file_years = np.arange(1990,2017)
-file_numbers = [10, 15, 16, 54]
+	for year in file_years:
+	    for file in file_numbers:
 
-for year in file_years:
-    for file in file_numbers:
+	        # pdb.set_trace()
+	        final_two_digits = str(year)
+	        final_two_digits = final_two_digits[-2:]
 
-        # pdb.set_trace()
-        final_two_digits = str(year)
-        final_two_digits = final_two_digits[-2:]
+	        # file_to_change = pd.read_csv(os.path.join(directory, ( 'pur' + str(year)), 'udc' + str(final_two_digits) + '_' + str(file) + '.txt')) #, header = True, na_rep = '0', index = False) 
+	        file_to_change = (os.path.join(directory, ( 'pur' + str(year)), 'udc' + str(final_two_digits) + '_' + str(file) )) #, header = True, na_rep = '0', index = False) 
+	        new_file_with_location = (os.path.join(new_directory, ( 'pur' + str(year)), 'udc' + str(final_two_digits) + '_' + str(file) ))
 
-        # file_to_change = pd.read_csv(os.path.join(directory, ( 'pur' + str(year)), 'udc' + str(final_two_digits) + '_' + str(file) + '.txt')) #, header = True, na_rep = '0', index = False) 
-        file_to_change = (os.path.join(directory, ( 'pur' + str(year)), 'udc' + str(final_two_digits) + '_' + str(file) )) #, header = True, na_rep = '0', index = False) 
-
-        new = open(file_to_change + '.txt').read().replace('?','0')
-        open(file_to_change + '_fixed.txt', 'w').write(new)
+	        new = open(file_to_change + '.txt').read().replace('?','0')
+	        open(new_file_with_location + '_fixed.txt', 'w').write(new)
 

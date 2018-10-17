@@ -308,7 +308,7 @@ def calculate_acres_pre_1990(year, crop_type, crop_iter, crop_list, tlb_overall_
         # pdb.set_trace()
 
         try:
-            for batch_num, individual_batch in enumerate(batch_IDs): #goes through the individual sites in the secition 
+            for batch_num, individual_batch in enumerate(batch_IDs): #goes through the individual sites in the section 
                 # pdb.set_trace()
                 # print('I think here is where the problem is')
                 specific_registrant = everything_in_this_comtrs.loc[everything_in_this_comtrs.batch_no == individual_batch] # locates all permits a specific site
@@ -375,7 +375,13 @@ def calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall
 
     # total_skipped = 0 
     # calPIP_data
+    # if year == 2015: 
+    #     pdb.set_trace()
+    # if (year == 2016) & (crop_type == 2006):
+    #     pdb.set_trace()
     crop_type_vals = tlb_overall_data.loc[lambda df: tlb_overall_data.site_code == crop_type, : ]  # pulls permits for each of the crop types (filters for only this crop)
+    # if (year == 2016) & (crop_type == 2006):
+    #     pdb.set_trace()
     # pdb.set_trace()
     print('Paused here in calculate_acres_1990_2016')
     # no_reg_firm_IDs = len(crop_type_vals.reg_firm_no.unique()) # number of registration firms for a specific crop 
@@ -405,35 +411,62 @@ def calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall
     # COMTRS_iter = 0 
     crop_acres_list = np.zeros([no_COMTRS, 1])
     # pdb.set_trace()
+    # if (year == 2016) & (crop_type == 2006):
+    #     pdb.set_trace()
 
     for COMTRS_iter, COMTRS_value in enumerate(tqdm(COMTRS_list)): 
         # pdb.set_trace()
         everything_in_this_comtrs = crop_type_vals.loc[crop_type_vals['comtrs'] == COMTRS_value, :]  # filters by fields in this specific COMTRS section 
-
+        # if (year == 2016) & (crop_type == 2006):
+        #     pdb.set_trace()
         site_loc_IDs = everything_in_this_comtrs.site_loc_id.unique()  # array of unique batch registration values in section
         num_site_loc_IDs = len(site_loc_IDs)   # number of parcels within the COMTRS
-
+        # if (year == 2016) & (crop_type == 2006):
+        #     pdb.set_trace()
         acreages_for_each_site_loc_id = np.zeros([num_site_loc_IDs, 1])  # empty array for the summed acreage for each parcel (site location)
-        for loc_id_num, individual_batch in enumerate(site_loc_IDs): #goes through the individual sites in the secition 
-            specific_registrant = everything_in_this_comtrs.loc[everything_in_this_comtrs.site_loc_id == individual_batch] # locates all permits a specific site
-            # pdb.set_trace()
-            # if specific_parcel.acre_planted
-            try:
-                total_at_this_site_loc = max(specific_registrant.acre_planted)  # maximum acreage reported for that SITE_LOCATION_ID 
-            except: 
-                total_at_this_site_loc = 0 
-                print(f'No value for amount planted at COMTRS {COMTRS_value} at registrant {individual_batch}')
+        # if (year == 2016) & (crop_type == 2006):
+        #     pdb.set_trace()
 
-            # commented these back in
-            # if pd.isnull(individual_site) == True or individual_site == np.nan:   # If site_ID is not labelled
-            #     total_at_site_loc = sum(specific_parcel.AMOUNT_PLANTED.unique()) # sum up all unique area values
-            acreages_for_each_site_loc_id[loc_id_num] = total_at_this_site_loc
-            total_in_COMTRS = sum(acreages_for_each_site_loc_id)
+        try:  # trys going through all IDs at this COMTRS- if none exists, will set total acreage of this crop to zero
+            # print('THIS WORKS')
+            # if (year == 2016) & (crop_type == 2006):
+            #     pdb.set_trace()
+            if len(everything_in_this_comtrs) > 0:
+                # if (year == 2016) & (crop_type == 2006):
+                #     pdb.set_trace()
+                for loc_id_num, individual_batch in enumerate(site_loc_IDs): #goes through the individual sites in the secition 
+                    # if (year == 2016) & (crop_type == 2006):
+                    #     pdb.set_trace()
+                    specific_registrant = everything_in_this_comtrs.loc[everything_in_this_comtrs.site_loc_id == individual_batch] # locates all permits a specific site
+                    # pdb.set_trace()
+                    # if specific_parcel.acre_planted
+                    try:
+                        total_at_this_site_loc = max(specific_registrant.acre_planted)  # maximum acreage reported for that SITE_LOCATION_ID 
+                    except: 
+                        total_at_this_site_loc = 0 
+                        print(f'No value for amount planted at COMTRS {COMTRS_value} at registrant {individual_batch}')
+
+                    # commented these back in
+                    # if pd.isnull(individual_site) == True or individual_site == np.nan:   # If site_ID is not labelled
+                    #     total_at_site_loc = sum(specific_parcel.AMOUNT_PLANTED.unique()) # sum up all unique area values
+                    acreages_for_each_site_loc_id[loc_id_num] = total_at_this_site_loc
+                    total_in_COMTRS = sum(acreages_for_each_site_loc_id)
+            else:
+                total_in_COMTRS = 0 
                 # pdb.set_trace()
 
+
+                # pdb.set_trace()
+        except:
+            print('THIS is throwing and exception')
+            # pdb.set_trace()
+            total_in_COMTRS = 0 
+            # pdb.set_trace()
+
         crop_acres_list[COMTRS_iter] = total_in_COMTRS  #puts all of this crop for this comtrs in the crop_acres_list
-    
     # pdb.set_trace()
+    # if (year == 2016) & (crop_type == 2006):
+        # pdb.set_trace()
     print('This point was reached yay')
 
     try:
@@ -442,6 +475,11 @@ def calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall
         crop2_df[crop_type_string] = crop_acres_list   #tried this method instead so nothing gets misassigned 
         # crop_test = crop4_df.loc[crop4_df.index == '10M10S13E34']
         # pdb.set_trace()
+        # if (year == 2016) & (crop_type == 2006):
+        #     pdb.set_trace()
+        #     print('final acreage number for crop 2006 is')
+        #     print(sum(crop_acres_list.values))
+        #     print('This line 455')
   
         if save_crop_file == 1:  # Saves each crop's data for each COMTRS 
             crop3_df = crop2_df.reset_index()
@@ -460,6 +498,8 @@ def calculate_acres_1990_2016(year, crop_type, crop_iter, crop_list, tlb_overall
             # comtrs_with_crop
     except:
         print('crop2_df may have been empty for this crop type')
+        # if (year == 2016) & (crop_type == 2006):
+            # pdb.set_trace()
 
     # pdb.set_trace()
     return crop2_df, crop_column, crop_iter, crop_acres_tulare
@@ -488,6 +528,9 @@ def compile_data_by_comtrs(year):
                 # pdb.set_trace()
     if year > 1989:
         for crop_type in tqdm(crop_list):  # Runs for each crop type in calPIP database, then connects to larger calPIP array using COMTRS index 
+            # pdb.set_trace()
+            # if crop_type == 2006:
+            #     pdb.set_trace()
             try:
                 # pdb.set_trace()
                 # print('run this by hand')
@@ -497,6 +540,9 @@ def compile_data_by_comtrs(year):
                 crop4_df[crop_column] = crop2_df[str(crop_column)].loc[crop2_df.index]  # Puts the individual crop acreage list into the overall dataframe crop4_df 
                 # tulare_overall_by_crop[crop_column] = crop_acres_tulare
                 print(f'crop2 dataframe EXISTS for crop type number {crop_type}') 
+                # if crop_type == '2006':
+                    # pdb.set_trace()
+                    # print('test our crop 2006 (oranges)')
             except:
                 crop_iter = crop_iter + 1 
                 print(f'crop2 dataframe may have been empty for this crop type number {crop_type}')    
@@ -551,7 +597,7 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
     tree_crops_1990_2016_list = tree_crops_1990_2016.values.tolist()  # why necessary?  
     tree_crops_1990_2016 = [str(round(i)) for i in tree_crops_1990_2016_list]
 
-    pdb.set_trace()
+    # pdb.set_trace()
 
     forage_crops_pre_1990 = codes_pre_1990.site_code_pre_1990.loc[codes_pre_1990.is_forage_pre_1990 == 1]
     forage_crops_pre_1990 = [str(round(i)) for i in forage_crops_pre_1990]
@@ -619,6 +665,7 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
                 # print('test stuff out here - sept. 12, 2018')
             tree_crop_columns = crop_data_in_irrigation_district.columns[crop_data_in_irrigation_district.columns.isin(tree_crops_1990_2016)]  # Columns that are tree crops 
             print(tree_crop_columns)
+            # pdb.set_trace()
             annual_crop_columns = crop_data_in_irrigation_district.columns[crop_data_in_irrigation_district.columns.isin(annual_crops_1990_2016)]  # Columns that are annual crops 
             forage_crop_columns = crop_data_in_irrigation_district.columns[crop_data_in_irrigation_district.columns.isin(forage_crops_1990_2016)]  # Columns that are annual crops 
             
@@ -626,7 +673,23 @@ def retrieve_data_for_irrigation_district(irrigation_district, normalized):
             # pdb.set_trace()
             # pdb.set_trace()
             sum_alfalfa = sum(crop_data_in_irrigation_district['23001'])
-            sum_nectarine = sum(crop_data_in_irrigation_district['5003'])        
+            sum_nectarine = sum(crop_data_in_irrigation_district['5003'])   
+            # sum_grape = sum(crop_data_in_irrigation_district['29141'])  
+            # sum_citrus = sum(crop_data_in_irrigation_district['2000'])  
+            # sum_nuts = sum(crop_data_in_irrigation_district['3000'])  
+            # sum_almond = sum(crop_data_in_irrigation_district['3001'])  
+            # sum_walnut = sum(crop_data_in_irrigation_district['3009'])  
+            # sum_apple = sum(crop_data_in_irrigation_district['4001'])  
+            # sum_grape = sum(crop_data_in_irrigation_district['29141'])  
+            # sum_grape = sum(crop_data_in_irrigation_district['29141'])  
+            # sum_grape = sum(crop_data_in_irrigation_district['29141'])  
+            # sum_grape = sum(crop_data_in_irrigation_district['29141'])  
+            # sum_grape = sum(crop_data_in_irrigation_district['29141'])  
+            # sum_grape = sum(crop_data_in_irrigation_district['29141'])   
+
+            # sum_trees_some = sum_alfalfa + sum_nectarine + sum_grape + sum_citrus + sum_nuts + sum_almond + sum_walnut + sum_apple
+            # # pdb.set_trace()
+            # print('test stuff out here Oct 2')     
 
         tree_data = crop_data_in_irrigation_district[tree_crop_columns]
         tree_crop_acreage_by_fruit_type = tree_data[tree_crop_columns].sum()
@@ -1186,9 +1249,13 @@ def plot_all_the_irrigation_district_bar_charts(irrigation_district_list):
 # for year in tqdm(range(1974, 2017)):
 #     compile_data_by_comtrs(year)
 
+
+# print('done with compiling')
 # pdb.set_trace()
+# year = 2016
 # compile_data_by_comtrs(year)
 # pdb.set_trace()
+# print('done with 2016 compiling ')
 # print('run again for different year')
 
 # # step 3: add the comts from 2005 - 2016 data: 
@@ -1217,8 +1284,8 @@ create_bar_chart = 0
 
 # Counties 
 # irrigation_district = 'Kings_County'
-# irrigation_district = 'Kern_County'
-irrigation_district = 'Fresno_County'
+irrigation_district = 'Kern_County'
+# irrigation_district = 'Fresno_County'
 # irrigation_district = 'Tulare_County'
 
 # irrigation_district = 'North_Kern_Water_Storage_District'
@@ -1248,7 +1315,7 @@ irrigation_district = 'Fresno_County'
 sum_crop_types, sum_crop_types_normalized, crop_data_in_irrigation_district, irrigation_district = retrieve_data_for_irrigation_district(irrigation_district, normalized)
 
 
-# pdb.set_trace()
+pdb.set_trace()
 # plot_data_for_irrigation_district(irrigation_district, sum_crop_types, normalized)
 # plot_tree_crop_percentages_for_irrigation_district(irrigation_district, sum_crop_types)
 

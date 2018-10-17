@@ -5,8 +5,8 @@ Implications for Agricultural Water Shortage
 Exploring trends from 1974 - 2016
 
 
-## Order of Operations 
-### Coming soon (late September 2018)
+## Antiquated repository - replaced as of October 2018 
+### Refer to repository crop_acreages_CA_DPR_reports
 Part 1: Download data at ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/
 1. Unzip each folder from 1974-2016 (e.g. pur1978.zip)
 2. save each folder as pur_data_raw/pur<year>   ( e.g. pur_data_raw/pur1975) 
